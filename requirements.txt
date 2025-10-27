@@ -1,0 +1,6 @@
+# No external dependencies required for this game
+# Python 3.12.4+ standard library only
+
+# Development dependencies (optional)
+pytest>=7.0.0
+pytest-cov>=4.0.0
