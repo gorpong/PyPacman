@@ -1,0 +1,62 @@
+"""
+Tests for input handling functionality.
+"""
+
+import unittest
+from src.input_handler import MockInputHandler
+from src.constants import Keys, Direction
+
+
+class TestInputHandler(unittest.TestCase):
+    """Test input handler functionality."""
+    
+    def setUp(self):
+        """Set up test fixtures."""
+        self.input_handler = MockInputHandler()
+    
+    def test_arrow_key_to_direction(self):
+        """Test arrow key to direction mapping."""
+        self.assertEqual(self.input_handler.key_to_direction(Keys.UP), Direction.UP)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.DOWN), Direction.DOWN)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.LEFT), Direction.LEFT)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.RIGHT), Direction.RIGHT)
+    
+    def test_wasd_key_to_direction(self):
+        """Test WASD key to direction mapping."""
+        self.assertEqual(self.input_handler.key_to_direction(Keys.W), Direction.UP)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.S), Direction.DOWN)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.A), Direction.LEFT)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.D), Direction.RIGHT)
+    
+    def test_invalid_key_to_direction(self):
+        """Test invalid key returns no direction."""
+        self.assertEqual(self.input_handler.key_to_direction('x'), Direction.NONE)
+        self.assertEqual(self.input_handler.key_to_direction(''), Direction.NONE)
+    
+    def test_is_quit_key(self):
+        """Test quit key detection."""
+        self.assertTrue(self.input_handler.is_quit_key(Keys.ESCAPE))
+        self.assertTrue(self.input_handler.is_quit_key(Keys.QUIT))
+        self.assertFalse(self.input_handler.is_quit_key(Keys.SPACE))
+        self.assertFalse(self.input_handler.is_quit_key('x'))
+    
+    def test_is_pause_key(self):
+        """Test pause key detection."""
+        self.assertTrue(self.input_handler.is_pause_key(Keys.SPACE))
+        self.assertFalse(self.input_handler.is_pause_key(Keys.ESCAPE))
+        self.assertFalse(self.input_handler.is_pause_key('x'))
+    
+    def test_mock_input_queue(self):
+        """Test mock input handler queue functionality."""
+        self.assertIsNone(self.input_handler.get_key())
+        
+        self.input_handler.add_key(Keys.UP)
+        self.input_handler.add_key(Keys.SPACE)
+        
+        self.assertEqual(self.input_handler.get_key(), Keys.UP)
+        self.assertEqual(self.input_handler.get_key(), Keys.SPACE)
+        self.assertIsNone(self.input_handler.get_key())
+
+
+if __name__ == '__main__':
+    unittest.main()
