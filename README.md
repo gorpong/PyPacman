@@ -30,12 +30,12 @@ python src/main.py
 ### Standard Controls
 - **↑/↓/←/→**: Move Pac-Man
 - **Space**: Pause/Resume game
-- **Q or ESC**: Quit game
+- **Q**: Quit game (with confirmation)
 
 ### Left-Handed Alternative
 - **W/A/S/D**: Move Pac-Man (Up/Left/Down/Right)
 - **Space**: Pause/Resume game
-- **Q or ESC**: Quit game
+- **Q**: Quit game (with confirmation)
 
 ## Development
 

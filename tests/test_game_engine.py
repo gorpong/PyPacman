@@ -65,8 +65,8 @@ class TestGameEngine(unittest.TestCase):
         
         self.assertEqual(self.game.state, GameState.PLAYING)
     
-    def test_escape_quits_from_any_state(self):
-        """Test escape key quits from any state."""
+    def test_q_shows_quit_confirmation(self):
+        """Test Q key shows quit confirmation from any state."""
         states = [GameState.MENU, GameState.PLAYING, GameState.PAUSED, GameState.GAME_OVER]
         
         for state in states:
@@ -75,12 +75,12 @@ class TestGameEngine(unittest.TestCase):
                 self.game.running = True
                 self.game.state = state
                 
-                # Simulate escape key press
-                self.input_handler.add_key(Keys.ESCAPE)
+                # Simulate Q key press
+                self.input_handler.add_key(Keys.QUIT)
                 self.game.handle_input()
                 
-                self.assertEqual(self.game.state, GameState.QUIT)
-                self.assertFalse(self.game.running)
+                self.assertEqual(self.game.state, GameState.QUIT_CONFIRM)
+                self.assertTrue(self.game.running)  # Should not quit immediately
     
     def test_reset_game(self):
         """Test game reset functionality."""
@@ -99,7 +99,7 @@ class TestGameEngine(unittest.TestCase):
     def test_update_calls_correct_handler(self):
         """Test update calls correct state handler."""
         # This is more of an integration test to ensure no crashes occur
-        states = [GameState.MENU, GameState.PLAYING, GameState.PAUSED, GameState.GAME_OVER]
+        states = [GameState.MENU, GameState.PLAYING, GameState.PAUSED, GameState.GAME_OVER, GameState.QUIT_CONFIRM]
         
         for state in states:
             with self.subTest(state=state):
@@ -109,7 +109,7 @@ class TestGameEngine(unittest.TestCase):
     
     def test_render_calls_correct_handler(self):
         """Test render calls correct state handler."""
-        states = [GameState.MENU, GameState.PLAYING, GameState.PAUSED, GameState.GAME_OVER]
+        states = [GameState.MENU, GameState.PLAYING, GameState.PAUSED, GameState.GAME_OVER, GameState.QUIT_CONFIRM]
         
         for state in states:
             with self.subTest(state=state):
@@ -141,6 +141,28 @@ class TestGameEngine(unittest.TestCase):
         
         # Simulate space key press
         self.input_handler.add_key(Keys.SPACE)
+        self.game.handle_input()
+        
+        self.assertEqual(self.game.state, GameState.PLAYING)
+    
+    def test_quit_confirmation_yes(self):
+        """Test quit confirmation with Y."""
+        self.game.state = GameState.QUIT_CONFIRM
+        
+        # Simulate Y key press
+        self.input_handler.add_key('y')
+        self.game.handle_input()
+        
+        self.assertEqual(self.game.state, GameState.QUIT)
+        self.assertFalse(self.game.running)
+    
+    def test_quit_confirmation_no(self):
+        """Test quit confirmation with N."""
+        self.game._previous_state = GameState.PLAYING
+        self.game.state = GameState.QUIT_CONFIRM
+        
+        # Simulate N key press
+        self.input_handler.add_key('n')
         self.game.handle_input()
         
         self.assertEqual(self.game.state, GameState.PLAYING)

@@ -77,6 +77,8 @@ class GameEngine:
             self.update_paused(delta_time)
         elif self.state == GameState.GAME_OVER:
             self.update_game_over(delta_time)
+        elif self.state == GameState.QUIT_CONFIRM:
+            self.update_quit_confirm(delta_time)
         elif self.state == GameState.QUIT:
             self.running = False
     
@@ -86,8 +88,18 @@ class GameEngine:
         if key is None:
             return
         
+        if self.state == GameState.QUIT_CONFIRM:
+            if key == 'y':
+                self.quit()
+            elif key == 'n' or key == ' ':
+                # Return to previous state (we'll store it)
+                self.state = getattr(self, '_previous_state', GameState.MENU)
+            return
+        
         if self.input_handler.is_quit_key(key):
-            self.quit()
+            # Store current state and show confirmation
+            self._previous_state = self.state
+            self.state = GameState.QUIT_CONFIRM
             return
         
         if self.state == GameState.MENU:
@@ -133,6 +145,10 @@ class GameEngine:
         """Update game over state."""
         pass
     
+    def update_quit_confirm(self, delta_time: float):
+        """Update quit confirmation state."""
+        pass
+    
     def render(self):
         """Render the current game state."""
         self.display.clear_buffer()
@@ -146,6 +162,9 @@ class GameEngine:
             self.render_pause_overlay()
         elif self.state == GameState.GAME_OVER:
             self.render_game_over()
+        elif self.state == GameState.QUIT_CONFIRM:
+            self.render_game()
+            self.render_quit_confirm()
         
         self.display.render()
     
@@ -159,7 +178,7 @@ class GameEngine:
         controls_y = title_y + 4
         self.display.draw_centered_text(controls_y, "Controls:", Colors.WHITE)
         self.display.draw_centered_text(controls_y + 1, "Arrow Keys or WASD to move", Colors.WHITE)
-        self.display.draw_centered_text(controls_y + 2, "SPACE to pause, Q or ESC to quit", Colors.WHITE)
+        self.display.draw_centered_text(controls_y + 2, "SPACE to pause, Q to quit", Colors.WHITE)
         
         start_y = controls_y + 5
         self.display.draw_centered_text(start_y, "Press SPACE to start!", Colors.YELLOW)
@@ -184,6 +203,12 @@ class GameEngine:
         self.display.draw_centered_text(overlay_y, "PAUSED", Colors.YELLOW)
         self.display.draw_centered_text(overlay_y + 1, "Press SPACE to continue", Colors.WHITE)
     
+    def render_quit_confirm(self):
+        """Render quit confirmation overlay."""
+        overlay_y = GAME_HEIGHT // 2 - 1
+        self.display.draw_centered_text(overlay_y, "Are you sure you want to quit?", Colors.YELLOW)
+        self.display.draw_centered_text(overlay_y + 1, "Press Y to quit, N or SPACE to continue", Colors.WHITE)
+    
     def render_game_over(self):
         """Render game over screen."""
         self.display.draw_border()
@@ -192,7 +217,7 @@ class GameEngine:
         self.display.draw_centered_text(center_y - 2, "GAME OVER", Colors.RED)
         self.display.draw_centered_text(center_y, f"Final Score: {self.score:06d}", Colors.YELLOW)
         self.display.draw_centered_text(center_y + 2, "Press SPACE to play again", Colors.WHITE)
-        self.display.draw_centered_text(center_y + 3, "Press Q or ESC to quit", Colors.WHITE)
+        self.display.draw_centered_text(center_y + 3, "Press Q to quit", Colors.WHITE)
     
     def reset_game(self):
         """Reset the game to initial state."""

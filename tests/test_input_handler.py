@@ -35,7 +35,6 @@ class TestInputHandler(unittest.TestCase):
     
     def test_is_quit_key(self):
         """Test quit key detection."""
-        self.assertTrue(self.input_handler.is_quit_key(Keys.ESCAPE))
         self.assertTrue(self.input_handler.is_quit_key(Keys.QUIT))
         self.assertFalse(self.input_handler.is_quit_key(Keys.SPACE))
         self.assertFalse(self.input_handler.is_quit_key('x'))
@@ -43,7 +42,7 @@ class TestInputHandler(unittest.TestCase):
     def test_is_pause_key(self):
         """Test pause key detection."""
         self.assertTrue(self.input_handler.is_pause_key(Keys.SPACE))
-        self.assertFalse(self.input_handler.is_pause_key(Keys.ESCAPE))
+        self.assertFalse(self.input_handler.is_pause_key(Keys.QUIT))
         self.assertFalse(self.input_handler.is_pause_key('x'))
     
     def test_mock_input_queue(self):
@@ -57,18 +56,16 @@ class TestInputHandler(unittest.TestCase):
         self.assertEqual(self.input_handler.get_key(), Keys.SPACE)
         self.assertIsNone(self.input_handler.get_key())
     
-    def test_arrow_keys_distinct_from_escape(self):
-        """Test that arrow keys are properly distinguished from ESC."""
+    def test_arrow_keys_work_correctly(self):
+        """Test that arrow keys work correctly."""
         # Arrow keys should return direction keys
         self.input_handler.add_key(Keys.UP)
         result = self.input_handler.get_key()
         self.assertEqual(result, Keys.UP)
-        self.assertNotEqual(result, Keys.ESCAPE)
         
-        # Pure ESC should return ESC
-        self.input_handler.add_key(Keys.ESCAPE)
+        self.input_handler.add_key(Keys.DOWN)
         result = self.input_handler.get_key()
-        self.assertEqual(result, Keys.ESCAPE)
+        self.assertEqual(result, Keys.DOWN)
 
 
 if __name__ == '__main__':

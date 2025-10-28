@@ -18,6 +18,7 @@ class GameState:
     PLAYING = "playing"
     PAUSED = "paused"
     GAME_OVER = "game_over"
+    QUIT_CONFIRM = "quit_confirm"
     QUIT = "quit"
 
 # Key mappings
@@ -36,7 +37,6 @@ class Keys:
     
     # Game controls
     SPACE = " "
-    ESCAPE = "\x1b"
     QUIT = "q"
 
 # Direction constants
