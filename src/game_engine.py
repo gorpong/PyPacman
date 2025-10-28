@@ -159,7 +159,7 @@ class GameEngine:
         controls_y = title_y + 4
         self.display.draw_centered_text(controls_y, "Controls:", Colors.WHITE)
         self.display.draw_centered_text(controls_y + 1, "Arrow Keys or WASD to move", Colors.WHITE)
-        self.display.draw_centered_text(controls_y + 2, "SPACE to pause, ESC to quit", Colors.WHITE)
+        self.display.draw_centered_text(controls_y + 2, "SPACE to pause, Q or ESC to quit", Colors.WHITE)
         
         start_y = controls_y + 5
         self.display.draw_centered_text(start_y, "Press SPACE to start!", Colors.YELLOW)
@@ -192,7 +192,7 @@ class GameEngine:
         self.display.draw_centered_text(center_y - 2, "GAME OVER", Colors.RED)
         self.display.draw_centered_text(center_y, f"Final Score: {self.score:06d}", Colors.YELLOW)
         self.display.draw_centered_text(center_y + 2, "Press SPACE to play again", Colors.WHITE)
-        self.display.draw_centered_text(center_y + 3, "Press ESC to quit", Colors.WHITE)
+        self.display.draw_centered_text(center_y + 3, "Press Q or ESC to quit", Colors.WHITE)
     
     def reset_game(self):
         """Reset the game to initial state."""

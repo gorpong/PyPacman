@@ -46,10 +46,12 @@ class InputHandler:
         
         # Handle escape sequences (arrow keys)
         if ch == '\x1b':
-            # Check for more characters
+            # Give a bit more time for the rest of the sequence to arrive
+            # Arrow keys send ESC [ A/B/C/D, so we need to read 2 more chars
             if select.select([sys.stdin], [], [], 0.1) != ([], [], []):
                 ch2 = sys.stdin.read(1)
                 if ch2 == '[':
+                    # Now read the direction character
                     if select.select([sys.stdin], [], [], 0.1) != ([], [], []):
                         ch3 = sys.stdin.read(1)
                         # Arrow key mappings
@@ -59,7 +61,16 @@ class InputHandler:
                             'C': Keys.RIGHT,
                             'D': Keys.LEFT
                         }
-                        return arrow_keys.get(ch3, ch)
+                        if ch3 in arrow_keys:
+                            return arrow_keys[ch3]
+                    # If we got '[' but no direction, it's an incomplete sequence
+                    # Return None instead of ESC to avoid false quits
+                    return None
+                else:
+                    # ESC followed by something other than '[' - could be Alt+key
+                    # Return None to ignore these sequences
+                    return None
+            # Pure ESC press with nothing following
             return Keys.ESCAPE
         
         return ch.lower()

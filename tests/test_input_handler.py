@@ -56,6 +56,19 @@ class TestInputHandler(unittest.TestCase):
         self.assertEqual(self.input_handler.get_key(), Keys.UP)
         self.assertEqual(self.input_handler.get_key(), Keys.SPACE)
         self.assertIsNone(self.input_handler.get_key())
+    
+    def test_arrow_keys_distinct_from_escape(self):
+        """Test that arrow keys are properly distinguished from ESC."""
+        # Arrow keys should return direction keys
+        self.input_handler.add_key(Keys.UP)
+        result = self.input_handler.get_key()
+        self.assertEqual(result, Keys.UP)
+        self.assertNotEqual(result, Keys.ESCAPE)
+        
+        # Pure ESC should return ESC
+        self.input_handler.add_key(Keys.ESCAPE)
+        result = self.input_handler.get_key()
+        self.assertEqual(result, Keys.ESCAPE)
 
 
 if __name__ == '__main__':
