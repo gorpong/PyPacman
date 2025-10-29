@@ -16,6 +16,7 @@ from .display import Display
 from .input_handler import InputHandler
 from .maze import Maze
 from .pacman import PacMan
+from .ghost_manager import GhostManager
 from data.levels import get_level
 
 
@@ -39,6 +40,7 @@ class GameEngine:
         # Game objects
         self.maze = None
         self.pacman = None
+        self.ghost_manager = None
         self._initialize_game()
         
     def start(self):
@@ -144,7 +146,7 @@ class GameEngine:
     
     def update_game(self, delta_time: float):
         """Update game state."""
-        if not self.pacman or not self.maze:
+        if not self.pacman or not self.maze or not self.ghost_manager:
             return
             
         # Update Pac-Man
@@ -158,16 +160,31 @@ class GameEngine:
         # Check power pellet collection
         if self.maze.collect_power_pellet(px, py):
             self.score += Score.POWER_PELLET
-            # TODO: Activate power mode for ghosts
+            self.ghost_manager.make_all_vulnerable()
             
         # Check level completion
         if self.maze.is_level_complete():
             self.level += 1
             self._initialize_game()
             
-        # TODO: Update ghosts
-        # TODO: Check ghost collisions
-        # TODO: Check win/lose conditions
+        # Update ghosts
+        self.ghost_manager.update(delta_time, self.maze, self.pacman)
+        
+        # Check ghost collisions
+        colliding_ghost = self.ghost_manager.check_collision_with_pacman(self.pacman)
+        if colliding_ghost:
+            if colliding_ghost.is_vulnerable():
+                # Eat the ghost
+                points = self.ghost_manager.eat_ghost(colliding_ghost)
+                self.score += points
+            elif colliding_ghost.is_dangerous():
+                # Pac-Man dies
+                self.lives -= 1
+                if self.lives <= 0:
+                    self.state = GameState.GAME_OVER
+                else:
+                    # Reset positions but keep score
+                    self._reset_positions()
     
     def update_paused(self, delta_time: float):
         """Update paused state."""
@@ -232,7 +249,9 @@ class GameEngine:
         if self.pacman:
             self._render_pacman()
             
-        # TODO: Draw ghosts
+        # Draw ghosts
+        if self.ghost_manager:
+            self._render_ghosts()
     
     def _render_maze(self):
         """Render the maze on the display."""
@@ -385,6 +404,29 @@ class GameEngine:
                     break
                     
         self.pacman = PacMan(start_x, start_y)
+        self.ghost_manager = GhostManager(self.maze)
+    
+    def _render_ghosts(self):
+        """Render all ghosts on the display."""
+        if not self.ghost_manager or not self.maze:
+            return
+            
+        # Calculate maze position on screen
+        maze_start_y = 3
+        maze_start_x = (GAME_WIDTH - self.maze.width) // 2
+        
+        # Get all ghost positions and render them
+        for x, y, sprite, color in self.ghost_manager.get_ghost_positions():
+            screen_x = maze_start_x + x
+            screen_y = maze_start_y + y
+            self.display.set_char(screen_x, screen_y, sprite, color)
+    
+    def _reset_positions(self):
+        """Reset Pac-Man and ghost positions after death."""
+        if self.pacman:
+            self.pacman.reset()
+        if self.ghost_manager:
+            self.ghost_manager.reset()
     
     def reset_game(self):
         """Reset the game to initial state."""

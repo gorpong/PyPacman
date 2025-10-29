@@ -99,3 +99,7 @@ class Score:
 INITIAL_LIVES = 3
 POWER_PELLET_DURATION = 10.0  # seconds
 GHOST_VULNERABLE_DURATION = 8.0  # seconds
+
+# Ghost scoring
+GHOST_SCORE_BASE = 200
+GHOST_SCORE_MULTIPLIER = 2  # Doubles for each subsequent ghost eaten
