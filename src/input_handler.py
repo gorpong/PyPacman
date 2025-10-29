@@ -49,27 +49,25 @@ class InputHandler:
             # Arrow keys send ESC [ A/B/C/D
             # Try to read the complete sequence
             try:
-                # Wait a short time for the bracket
-                if select.select([sys.stdin], [], [], 0.05) != ([], [], []):
-                    ch2 = sys.stdin.read(1)
-                    if ch2 == '[':
-                        # Wait for the direction character
-                        if select.select([sys.stdin], [], [], 0.05) != ([], [], []):
-                            ch3 = sys.stdin.read(1)
-                            # Arrow key mappings
-                            arrow_keys = {
-                                'A': Keys.UP,
-                                'B': Keys.DOWN, 
-                                'C': Keys.RIGHT,
-                                'D': Keys.LEFT
-                            }
-                            if ch3 in arrow_keys:
-                                return arrow_keys[ch3]
-                # If we can't parse it as arrow key, ignore the sequence
-                return None
+                # Read the bracket immediately (without timeout)
+                ch2 = sys.stdin.read(1)
+                if ch2 == '[':
+                    # Read the direction character immediately
+                    ch3 = sys.stdin.read(1)
+                    # Arrow key mappings
+                    arrow_keys = {
+                        'A': 'up',
+                        'B': 'down', 
+                        'C': 'right',
+                        'D': 'left'
+                    }
+                    if ch3 in arrow_keys:
+                        return arrow_keys[ch3]
+                # If we can't parse it as arrow key, return the escape for quit
+                return 'escape'
             except:
-                # If anything goes wrong, ignore
-                return None
+                # If anything goes wrong, return escape for quit
+                return 'escape'
         
         # Return regular character (convert to lowercase for consistency)
         return ch.lower()
@@ -78,10 +76,10 @@ class InputHandler:
         """Convert key press to direction vector."""
         key_mapping = {
             # Standard arrow keys
-            Keys.UP: Direction.UP,
-            Keys.DOWN: Direction.DOWN,
-            Keys.LEFT: Direction.LEFT,
-            Keys.RIGHT: Direction.RIGHT,
+            'up': Direction.UP,
+            'down': Direction.DOWN,
+            'left': Direction.LEFT,
+            'right': Direction.RIGHT,
             
             # Left-handed alternatives
             Keys.W: Direction.UP,
@@ -94,7 +92,7 @@ class InputHandler:
     
     def is_quit_key(self, key: str) -> bool:
         """Check if the key is a quit command."""
-        return key == Keys.QUIT
+        return key == Keys.QUIT or key == 'escape'
     
     def is_pause_key(self, key: str) -> bool:
         """Check if the key is a pause command."""

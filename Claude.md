@@ -131,11 +131,22 @@ ascii-pacman/
 - **Manual Tests**: Gameplay testing and user experience
 - **Continuous Integration**: Each phase must pass all tests before merging
 
-### Branch Strategy
-1. Each phase gets its own feature branch
-2. All tests must pass before merging to main
-3. Code review checklist for each phase
-4. Main branch always represents a working game state
+### Branch Strategy and Git Workflow
+1. **Phase Branches**: Each phase gets its own feature branch (e.g., `phase-2-maze`, `phase-3-pacman`)
+2. **Development Process**: 
+   - Work on features in phase branches
+   - Commit frequently with descriptive messages
+   - All tests must pass before declaring phase complete
+   - **Do NOT merge to main until explicit approval**
+3. **Code Review Process**:
+   - Phase must be tested and reviewed before merge approval
+   - Maintainer will give explicit go-ahead to merge
+   - Only then merge phase branch to main and create next phase branch
+4. **Main Branch**: Always represents a stable, working game state
+5. **Commit Standards**:
+   - Descriptive commit messages
+   - Atomic commits for specific features
+   - Clean history before merging
 
 ## Success Criteria
 - [ ] Game runs smoothly in 80x24 terminal
@@ -148,3 +159,36 @@ ascii-pacman/
 
 ## Development Timeline
 Each phase is estimated to be completed in sequence, with the foundation being the most critical for establishing the architecture that all subsequent phases will build upon.
+
+## Current Status
+**Phase 2: Maze and World - FIXES IN PROGRESS**
+Working on critical issues identified in code review before completing Phase 2.
+
+### Issues Fixed in Current Session:
+✅ **Arrow Key Detection** - Fixed input handler to properly detect arrow keys without delays
+✅ **Constants Refactoring** - Moved hardcoded characters to constants.py for maintainability
+✅ **Border Characters** - Using BorderChars constants for consistent styling
+✅ **Wall Color Fix** - Walls now properly display in BLUE as intended
+✅ **Maze Connectivity** - Using verified test maze with all dots reachable
+✅ **Code Organization** - Proper separation of constants from implementation
+
+### Remaining Phase 2 Tasks:
+✅ **Quit confirmation dialog** - Added a boxed overlay with clear background for better visibility
+✅ **Pause dialog** - Added similar boxed overlay for consistency  
+✅ **Maze walls** - Changed from hash marks (#) to solid block characters (█) for cleaner appearance
+✅ **Maze layout** - Using properly connected test maze (28x13) that fits terminal
+✅ **Ghost house** - Properly integrated with special floor indicators
+✅ **Wall collision detection** - Pac-Man correctly stops at walls
+✅ **Dot collection mechanics** - Dots are collected and score updates properly
+✅ **Power pellet collection** - Power pellets can be collected with proper scoring
+✅ **Level completion detection** - Maze tracks when all dots/pellets are collected
+✅ **Comprehensive testing** - All tests passing, maze connectivity verified
+
+### Phase 3 Progress (Pac-Man Character):
+✅ **Basic Pac-Man implementation** - Character moves and animates
+✅ **Direction-based sprites** - Shows >, <, ^, v based on movement direction  
+✅ **Mouth animation** - Opens and closes while moving
+✅ **Smooth movement** - Moves at consistent speed through the maze
+✅ **Dot consumption** - Collects dots and updates score
+
+**Status**: Ready for Phase 2 review and approval to merge to main.

@@ -6,7 +6,7 @@ Handles screen clearing, centering, and ASCII art rendering.
 import os
 import shutil
 from typing import List, Tuple
-from .constants import GAME_WIDTH, GAME_HEIGHT, MIN_TERMINAL_WIDTH, MIN_TERMINAL_HEIGHT, Colors
+from .constants import GAME_WIDTH, GAME_HEIGHT, MIN_TERMINAL_WIDTH, MIN_TERMINAL_HEIGHT, Colors, BorderChars
 
 
 class Display:
@@ -77,19 +77,19 @@ class Display:
         """Draw a border around the game area."""
         # Top and bottom borders
         for x in range(GAME_WIDTH):
-            self.set_char(x, 0, '═', Colors.WHITE)
-            self.set_char(x, GAME_HEIGHT - 1, '═', Colors.WHITE)
+            self.set_char(x, 0, BorderChars.HORIZONTAL, Colors.WHITE)
+            self.set_char(x, GAME_HEIGHT - 1, BorderChars.HORIZONTAL, Colors.WHITE)
         
         # Left and right borders  
         for y in range(GAME_HEIGHT):
-            self.set_char(0, y, '║', Colors.WHITE)
-            self.set_char(GAME_WIDTH - 1, y, '║', Colors.WHITE)
+            self.set_char(0, y, BorderChars.VERTICAL, Colors.WHITE)
+            self.set_char(GAME_WIDTH - 1, y, BorderChars.VERTICAL, Colors.WHITE)
         
         # Corners
-        self.set_char(0, 0, '╔', Colors.WHITE)
-        self.set_char(GAME_WIDTH - 1, 0, '╗', Colors.WHITE)
-        self.set_char(0, GAME_HEIGHT - 1, '╚', Colors.WHITE)
-        self.set_char(GAME_WIDTH - 1, GAME_HEIGHT - 1, '╝', Colors.WHITE)
+        self.set_char(0, 0, BorderChars.TOP_LEFT, Colors.WHITE)
+        self.set_char(GAME_WIDTH - 1, 0, BorderChars.TOP_RIGHT, Colors.WHITE)
+        self.set_char(0, GAME_HEIGHT - 1, BorderChars.BOTTOM_LEFT, Colors.WHITE)
+        self.set_char(GAME_WIDTH - 1, GAME_HEIGHT - 1, BorderChars.BOTTOM_RIGHT, Colors.WHITE)
     
     def draw_centered_text(self, y: int, text: str, color: str = Colors.WHITE):
         """Draw text centered horizontally at the given y position."""

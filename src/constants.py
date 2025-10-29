@@ -49,10 +49,11 @@ class Direction:
 
 # ASCII characters for game elements
 class Sprites:
-    WALL = "#"
+    WALL = "█"  # Block character for walls
     DOT = "."
     POWER_PELLET = "O"
     EMPTY = " "
+    GHOST_HOUSE_FLOOR = "═"  # Ghost house floor indicator
     
     # Pac-Man sprites (direction-based)
     PACMAN_RIGHT = ">"
@@ -65,16 +66,27 @@ class Sprites:
     GHOST = "&"
     VULNERABLE_GHOST = "%"
 
+# UI Border characters
+class BorderChars:
+    # Double-line box drawing characters for main border
+    HORIZONTAL = "═"
+    VERTICAL = "║"
+    TOP_LEFT = "╔"
+    TOP_RIGHT = "╗"
+    BOTTOM_LEFT = "╚"
+    BOTTOM_RIGHT = "╝"
+
 # Colors (for terminals that support them)
 class Colors:
     RESET = "\033[0m"
+    BLACK = "\033[40m"   # Background color for overlays
     YELLOW = "\033[93m"  # Pac-Man
     RED = "\033[91m"     # Blinky
     PINK = "\033[95m"    # Pinky
     CYAN = "\033[96m"    # Inky
     ORANGE = "\033[38;5;208m"  # Clyde
-    BLUE = "\033[94m"    # Vulnerable ghosts
-    WHITE = "\033[97m"   # Walls and dots
+    BLUE = "\033[94m"    # Walls and vulnerable ghosts
+    WHITE = "\033[97m"   # Dots and text
 
 # Scoring
 class Score:
