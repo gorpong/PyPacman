@@ -1,25 +1,9 @@
 """
-Main entry point for ASCII Pac-Man game.
+Main entry point for ASCII Pac-Man game (legacy).
+This file is maintained for backwards compatibility.
 """
 
-import sys
-import os
-
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from src.game_engine import GameEngine
-
-
-def main():
-    """Main function to start the game."""
-    try:
-        game = GameEngine()
-        game.start()
-    except Exception as e:
-        print(f"Error starting game: {e}")
-        sys.exit(1)
-
+from ascii_pacman import main
 
 if __name__ == "__main__":
     main()
