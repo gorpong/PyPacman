@@ -12,7 +12,7 @@ from ..data.levels import get_level
 class GameEngine:
     """Main game engine that manages the game loop and state."""
     
-    def __init__(self, display: Optional[Display] = None, input_handler: Optional[InputHandler] = None):
+    def __init__(self, display: Optional[Display] = None, input_handler: Optional[InputHandler] = None) -> None:
         """Initialize the game engine."""
         self.display = display or Display()
         self.input_handler = input_handler or InputHandler()
@@ -34,7 +34,7 @@ class GameEngine:
         self.ghost_manager = None
         self._initialize_game()
         
-    def start(self):
+    def start(self) -> None:
         """Start the game engine."""
         try:
             self.display.clear_screen()
@@ -45,12 +45,12 @@ class GameEngine:
         finally:
             self.cleanup()
     
-    def cleanup(self):
+    def cleanup(self) -> None:
         """Clean up resources."""
         self.display.show_cursor()
         self.input_handler.cleanup()
     
-    def quit(self):
+    def quit(self) -> None:
         """Quit the game."""
         self.state = GameState.QUIT
         self.running = False

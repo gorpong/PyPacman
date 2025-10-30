@@ -31,6 +31,7 @@ dependencies = []
 
 [project.scripts]
 ascii-pacman = "ascii_pacman:main"
+pacman = "ascii_pacman:main"
 
 [project.urls]
 Homepage = "https://github.com/yourusername/ascii-pacman"

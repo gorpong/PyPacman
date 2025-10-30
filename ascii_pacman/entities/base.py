@@ -11,11 +11,11 @@ class Position:
     x: int
     y: int
     
-    def __iter__(self):
+    def __iter__(self) -> iter:
         """Allow unpacking as tuple."""
         return iter((self.x, self.y))
     
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """Compare positions."""
         if isinstance(other, Position):
             return self.x == other.x and self.y == other.y
@@ -55,7 +55,7 @@ class MovableEntity:
         self.move_timer = 0.0
         self.moving = False
         
-    def reset(self):
+    def reset(self) -> None:
         """Reset entity to starting position."""
         self.position.x = self.start_position.x
         self.position.y = self.start_position.y
@@ -68,12 +68,12 @@ class MovableEntity:
         """Get current position as tuple."""
         return (self.position.x, self.position.y)
     
-    def set_position(self, x: int, y: int):
+    def set_position(self, x: int, y: int) -> None:
         """Set the entity's position."""
         self.position.x = x
         self.position.y = y
         
-    def can_move_to(self, maze, x: int, y: int) -> bool:
+    def can_move_to(self, maze: 'Maze', x: int, y: int) -> bool:
         """
         Check if entity can move to the given position.
         
@@ -87,7 +87,7 @@ class MovableEntity:
         """
         return maze.is_walkable(x, y)
     
-    def move(self, maze, direction: Tuple[int, int]) -> bool:
+    def move(self, maze: 'Maze', direction: Tuple[int, int]) -> bool:
         """
         Attempt to move in the given direction.
         
@@ -121,7 +121,7 @@ class MovableEntity:
         self.moving = False
         return False
     
-    def update_movement(self, delta_time: float, maze) -> bool:
+    def update_movement(self, delta_time: float, maze: 'Maze') -> bool:
         """
         Update movement based on speed and time.
         

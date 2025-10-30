@@ -8,7 +8,7 @@ from ..core.constants import Direction, Sprites
 class PacMan(MovableEntity):
     """The player-controlled Pac-Man character."""
     
-    def __init__(self, start_x: int, start_y: int):
+    def __init__(self, start_x: int, start_y: int) -> None:
         """Initialize Pac-Man at the given position."""
         super().__init__(start_x, start_y, speed=8.0)
         
@@ -21,7 +21,7 @@ class PacMan(MovableEntity):
         self.animation_timer = 0.0
         self.mouth_open = True
         
-    def reset(self):
+    def reset(self) -> None:
         """Reset Pac-Man to starting position."""
         super().reset()
         self.direction = Direction.RIGHT
@@ -29,7 +29,7 @@ class PacMan(MovableEntity):
         self.animation_frame = 0
         self.mouth_open = True
         
-    def set_direction(self, direction: Tuple[int, int]):
+    def set_direction(self, direction: Tuple[int, int]) -> None:
         """
         Set the next direction for Pac-Man to move.
         
@@ -39,7 +39,7 @@ class PacMan(MovableEntity):
         if direction != Direction.NONE:
             self.next_direction = direction
             
-    def update(self, delta_time: float, maze):
+    def update(self, delta_time: float, maze: 'Maze') -> None:
         """
         Update Pac-Man's position and animation.
         

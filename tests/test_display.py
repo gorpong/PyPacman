@@ -3,7 +3,7 @@ Tests for display and rendering functionality.
 """
 
 import unittest
-from src.display import MockDisplay
+from ascii_pacman.ui.display import MockDisplay
 from src.constants import GAME_WIDTH, GAME_HEIGHT, Colors
 
 

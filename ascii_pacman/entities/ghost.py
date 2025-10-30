@@ -26,7 +26,7 @@ class GhostState(Enum):
 class Ghost(MovableEntity):
     """Base ghost class with common behaviors."""
     
-    def __init__(self, start_x: int, start_y: int, color: str, name: str):
+    def __init__(self, start_x: int, start_y: int, color: str, name: str) -> None:
         """Initialize a ghost."""
         super().__init__(start_x, start_y, speed=7.0)  # Slightly slower than Pac-Man
         
@@ -47,7 +47,7 @@ class Ghost(MovableEntity):
         self.scatter_target = Position(1, 1)  # Top-left corner by default
         self.release_delay = 0.0  # Time before leaving house
         
-    def reset(self):
+    def reset(self) -> None:
         """Reset ghost to starting position and state."""
         super().reset()
         self.direction = Direction.UP
@@ -57,7 +57,7 @@ class Ghost(MovableEntity):
         self.vulnerable_timer = 0.0
         self.release_timer = 0.0
         
-    def update(self, delta_time: float, maze, pacman):
+    def update(self, delta_time: float, maze: 'Maze', pacman: 'PacMan') -> None:
         """Update ghost AI and movement."""
         # Update timers
         self.mode_timer += delta_time

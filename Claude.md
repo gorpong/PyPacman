@@ -207,3 +207,14 @@ Major codebase improvements implemented:
 
 **Status**: Refactoring complete, ready for Phase 5 (Game Logic and Polish)
 **Current Branch**: `refactor-package-structure`
+
+## Documentation Maintenance 📚
+**IMPORTANT**: Always keep README.md and Claude.md files up to date when making changes that affect:
+- Installation instructions
+- Usage/commands  
+- Feature descriptions
+- Project structure
+- Development status
+- Architecture changes
+
+This ensures new contributors and users always have current information.

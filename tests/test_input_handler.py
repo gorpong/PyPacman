@@ -3,7 +3,7 @@ Tests for input handling functionality.
 """
 
 import unittest
-from src.input_handler import MockInputHandler
+from ascii_pacman.ui.input_handler import MockInputHandler
 from src.constants import Keys, Direction
 
 

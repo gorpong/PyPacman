@@ -38,6 +38,7 @@ setup(
     entry_points={
         "console_scripts": [
             "ascii-pacman=ascii_pacman.main:main",
+            "pacman=ascii_pacman.main:main",
         ],
     },
 )
