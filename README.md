@@ -1,21 +1,38 @@
-# ASCII Pac-Man
+# ASCII Pac-Man v1.0
 
-A classic terminal-based ASCII version of Pac-Man, bringing the arcade experience to your command line!
+A complete terminal-based ASCII version of Pac-Man, bringing the arcade experience to your command line!
+
+**🎉 Version 1.0 - Full Release! 🎉**
 
 ## Features
 
-- 🎮 **Classic Gameplay**: Navigate through mazes, collect dots, avoid ghosts
+### Gameplay
+- 🎮 **Classic Pac-Man Gameplay**: Navigate mazes, collect dots, avoid ghosts
 - 👻 **Four Unique Ghosts**: Each with distinct AI personalities (Blinky, Pinky, Inky, Clyde)
-- 🎯 **Power Pellets**: Turn vulnerable ghosts blue and eat them for bonus points!
+- 🎯 **Power Pellets**: Turn vulnerable ghosts blue and eat them for bonus points
+- 💀 **Progressive Ghost Scoring**: 200, 400, 800, 1600 points per combo
+- ❤️ **Lives System**: Start with 3 lives, respawn after death
+- 📈 **Level Progression**: Increasing difficulty with faster ghosts
+- 🏆 **High Score System**: Top 10 scores saved with player names
+
+### Visual & Audio
 - 🎨 **ASCII Graphics**: Beautiful terminal-based visuals using Unicode characters
+- ✨ **Visual Effects**: Score popups, death animations, power pellet effects
+- 📺 **Scrolling High Scores**: Arcade-style attract mode on splash screen
+- 🖥️ **Terminal Optimized**: Works great in 80x24 terminals, auto-centers on larger displays
+
+### Controls & Interface
 - 🎮 **Dual Control Schemes**: 
   - Arrow keys (↑↓←→) for traditional users
   - WASD for left-handed players
-- 📊 **Score System**: Progressive scoring with ghost combo multipliers
-- ❤️ **Multiple Lives**: Start with 3 lives
-- 🖥️ **Terminal Optimized**: Works great in 80x24 terminals, auto-centers on larger displays
+- ⏸️ **Pause/Resume**: SPACE to pause, ESC or Q to quit
+- 📊 **Live HUD**: Score, high score, lives, and level display
+
+### Technical
 - 🐍 **Pure Python**: No external dependencies, uses only Python standard library
 - 🌍 **Cross-Platform**: Runs on Linux, macOS, and Windows
+- 📦 **Easy Installation**: pip installable, console entry points
+- ✅ **Well Tested**: 84 comprehensive unit tests
 
 ## Requirements
 

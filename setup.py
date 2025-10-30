@@ -18,7 +18,7 @@ setup(
         'ascii_pacman': ['data/*.py'],
     },
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: End Users/Desktop",
         "License :: OSI Approved :: MIT License",
