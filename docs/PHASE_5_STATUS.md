@@ -58,11 +58,22 @@
 - Ghost collision only checks ACTIVE state
 - Blinking cursor effect using time-based toggle
 
+## Updates After Review
+
+### Issues Fixed (Latest Commit)
+- ✅ **Enter key recognition** - Fixed to handle CR/LF/Enter variants properly
+- ✅ **Ghost eating detection** - Now properly detects and eats vulnerable ghosts
+- ✅ **Ghost teleportation** - Eaten ghosts instantly teleport home (no traveling)
+- ✅ **Ghost combo reset** - Combo resets with each new power pellet (not carryover)
+- ✅ **High score leaderboard** - Game over screen shows top 10 scores
+- ✅ **Ghost respawn** - Eaten ghosts properly reset to SCATTER mode when leaving house
+
 ## Ready for Review
-Phase 5 is complete with all requested features:
-1. ✅ High score persistence with player names
+Phase 5 is complete with all requested features and fixes:
+1. ✅ High score persistence with player names and leaderboard
 2. ✅ ASCII-based visual effects for key events
-3. ✅ Ghost eating bug fixed
+3. ✅ All ghost eating bugs fixed
 
 Branch: `phase-5-gameplay`
 Status: **Awaiting approval to merge to master**
+Tests: **77/77 passing**
