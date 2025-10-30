@@ -56,7 +56,7 @@ class ScoringSystem:
     def add_power_pellet(self) -> int:
         """Award points for eating a power pellet."""
         self.score += self.POWER_PELLET_POINTS
-        self.ghosts_eaten_combo = 0  # Reset combo for new power pellet
+        # Don't reset combo here - it should reset when pellet is collected
         return self.POWER_PELLET_POINTS
         
     def add_ghost(self) -> int:

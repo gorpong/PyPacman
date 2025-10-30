@@ -167,7 +167,7 @@ class GameEngine:
     
     def _handle_high_score_input(self, key: str) -> None:
         """Handle input for high score name entry."""
-        if key == '\n':  # Enter - submit name
+        if key in ['\n', '\r', '\x0d', '\x0a']:  # Enter/Return - submit name
             if self.player_name:
                 self.scoring.add_high_score(self.player_name)
             self.state = GameState.GAME_OVER
@@ -213,6 +213,8 @@ class GameEngine:
         if self.maze.collect_power_pellet(px, py):
             points = self.scoring.add_power_pellet()
             self.ghost_manager.make_all_vulnerable()
+            # Reset ghost combo when eating new power pellet
+            self.scoring.reset_ghost_combo()
             # Show score popup
             self.score_popup = (f"+{points}", px, py, 1.0)
             
@@ -475,15 +477,25 @@ class GameEngine:
         """Render game over screen."""
         self.display.draw_border()
         
-        center_y = GAME_HEIGHT // 2
         score = self.scoring.get_score()
-        high_score = self.scoring.get_high_score()
+        high_scores = self.scoring.get_high_scores()
         
-        self.display.draw_centered_text(center_y - 3, "GAME OVER", Colors.RED)
-        self.display.draw_centered_text(center_y - 1, f"Final Score: {score:06d}", Colors.YELLOW)
-        self.display.draw_centered_text(center_y, f"High Score: {high_score:06d}", Colors.CYAN)
-        self.display.draw_centered_text(center_y + 2, "Press SPACE to play again", Colors.WHITE)
-        self.display.draw_centered_text(center_y + 3, "Press Q to quit", Colors.WHITE)
+        # Show high scores leaderboard
+        y = 3
+        self.display.draw_centered_text(y, "HIGH SCORES", Colors.YELLOW)
+        y += 2
+        
+        # Display top 10 scores
+        for i, (name, points) in enumerate(high_scores[:10]):
+            rank = f"{i+1:2}."
+            score_text = f"{rank} {name[:15]:15} {points:06d}"
+            color = Colors.CYAN if points == score else Colors.WHITE
+            self.display.draw_centered_text(y + i, score_text, color)
+        
+        # Game over message
+        self.display.draw_centered_text(GAME_HEIGHT - 5, "GAME OVER", Colors.RED)
+        self.display.draw_centered_text(GAME_HEIGHT - 3, "Press SPACE to play again", Colors.WHITE)
+        self.display.draw_centered_text(GAME_HEIGHT - 2, "Press Q to quit", Colors.WHITE)
     
     def render_high_score_entry(self) -> None:
         """Render high score entry screen."""

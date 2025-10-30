@@ -72,6 +72,9 @@ class Ghost(MovableEntity):
             self.release_timer += delta_time
             if self.release_timer >= self.release_delay:
                 self.state = GhostState.LEAVING_HOUSE
+                # Reset mode to scatter when leaving house after being eaten
+                if self.mode == GhostMode.EATEN:
+                    self.mode = GhostMode.SCATTER
         
         # Update AI behavior
         self._update_ai(maze, pacman)
@@ -191,7 +194,13 @@ class Ghost(MovableEntity):
     def get_eaten(self):
         """Handle ghost being eaten by Pac-Man."""
         self.mode = GhostMode.EATEN
-        self.state = GhostState.RETURNING
+        self.state = GhostState.IN_HOUSE
+        # Teleport back to starting position
+        self.position.x = self.start_position.x
+        self.position.y = self.start_position.y
+        self.direction = Direction.NONE
+        # Reset release timer so it comes back out
+        self.release_timer = 0.0
     
     def is_vulnerable(self) -> bool:
         """Check if ghost is vulnerable to Pac-Man."""

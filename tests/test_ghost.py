@@ -93,10 +93,18 @@ class TestGhost(unittest.TestCase):
         """Test ghost being eaten."""
         ghost = Blinky(10, 7)
         ghost.state = GhostState.ACTIVE
+        original_x, original_y = ghost.start_position.x, ghost.start_position.y
+        
+        # Move ghost away from start
+        ghost.position.x = 15
+        ghost.position.y = 15
         
         ghost.get_eaten()
         self.assertEqual(ghost.mode, GhostMode.EATEN)
-        self.assertEqual(ghost.state, GhostState.RETURNING)
+        self.assertEqual(ghost.state, GhostState.IN_HOUSE)
+        # Should teleport back to start position
+        self.assertEqual(ghost.position.x, original_x)
+        self.assertEqual(ghost.position.y, original_y)
     
     def test_ghost_collision(self):
         """Test ghost collision detection."""
