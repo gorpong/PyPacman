@@ -41,6 +41,7 @@ class GhostManager:
         
         # Track eaten ghosts for scoring
         self.ghosts_eaten_in_sequence = 0
+        self.vulnerability_expired = False
         
     def _find_ghost_house_center(self, maze: Maze) -> Position:
         """Find the center of the ghost house in the maze."""
@@ -78,8 +79,13 @@ class GhostManager:
         
         # Check if vulnerable ghosts have expired
         any_vulnerable = any(ghost.is_vulnerable() for ghost in self.ghosts)
-        if not any_vulnerable and self.ghosts_eaten_in_sequence > 0:
+        was_vulnerable = self.ghosts_eaten_in_sequence > 0 or any(g.vulnerable_timer > 0 for g in self.ghosts)
+        
+        if was_vulnerable and not any_vulnerable:
             self.ghosts_eaten_in_sequence = 0  # Reset eaten counter
+            self.vulnerability_expired = True  # Signal that vulnerability just ended
+        else:
+            self.vulnerability_expired = False
         
         # Handle mode sequence timing
         if (self.sequence_index < len(self.mode_sequence) and 

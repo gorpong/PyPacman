@@ -4,6 +4,8 @@ import time
 from typing import Optional
 from .constants import GameState, FRAME_TIME, Colors, GAME_WIDTH, GAME_HEIGHT, Score, Sprites
 from .maze import Maze
+from .scoring import ScoringSystem
+from .game_state import GameState as GameStateManager
 from ..ui import Display, InputHandler
 from ..entities import PacMan, GhostManager, Position
 from ..data.levels import get_level
@@ -23,10 +25,9 @@ class GameEngine:
         self.last_frame_time = 0.0
         self.paused = False
         
-        # Game statistics
-        self.score = 0
-        self.lives = 3
-        self.level = 1
+        # Game systems
+        self.scoring = ScoringSystem()
+        self.game_state = GameStateManager(starting_lives=3)
         
         # Game objects
         self.maze = None
@@ -169,20 +170,24 @@ class GameEngine:
         # Check dot collection
         px, py = self.pacman.get_position()
         if self.maze.collect_dot(px, py):
-            self.score += Score.DOT
+            self.scoring.add_dot()
             
         # Check power pellet collection
         if self.maze.collect_power_pellet(px, py):
-            self.score += Score.POWER_PELLET
+            self.scoring.add_power_pellet()
             self.ghost_manager.make_all_vulnerable()
             
         # Check level completion
         if self.maze.is_level_complete():
-            self.level += 1
+            self.game_state.next_level()
             self._initialize_game()
             
         # Update ghosts
         self.ghost_manager.update(delta_time, self.maze, self.pacman)
+        
+        # Reset ghost combo if vulnerability expired
+        if self.ghost_manager.vulnerability_expired:
+            self.scoring.reset_ghost_combo()
         
         # Check ghost collisions
         self._check_ghost_collisions()
@@ -194,12 +199,13 @@ class GameEngine:
             if colliding_ghost.is_vulnerable():
                 # Eat the ghost
                 points = self.ghost_manager.eat_ghost(colliding_ghost)
-                self.score += points
+                self.scoring.add_ghost()
             elif colliding_ghost.is_dangerous():
                 # Pac-Man dies
-                self.lives -= 1
-                if self.lives <= 0:
+                game_over = self.game_state.lose_life()
+                if game_over:
                     self.state = GameState.GAME_OVER
+                    self.scoring.update_high_score()
                 else:
                     # Reset positions but keep score
                     self._reset_positions()
@@ -268,9 +274,15 @@ class GameEngine:
         self.display.draw_border()
         
         # Draw UI at top
-        self.display.set_string(2, 1, f"Score: {self.score:06d}", Colors.YELLOW)
-        self.display.set_string(25, 1, f"Lives: {self.lives}", Colors.RED)
-        self.display.set_string(GAME_WIDTH - 12, 1, f"Level: {self.level}", Colors.CYAN)
+        score = self.scoring.get_score()
+        high_score = self.scoring.get_high_score()
+        lives = self.game_state.get_lives()
+        level = self.game_state.get_level()
+        
+        self.display.set_string(2, 1, f"Score: {score:06d}", Colors.YELLOW)
+        self.display.set_string(22, 1, f"High: {high_score:06d}", Colors.CYAN)
+        self.display.set_string(42, 1, f"Lives: {lives}", Colors.RED)
+        self.display.set_string(GAME_WIDTH - 12, 1, f"Level: {level}", Colors.CYAN)
         
         # Draw maze starting at row 3 (below UI)
         if self.maze:
@@ -405,14 +417,18 @@ class GameEngine:
         self.display.draw_border()
         
         center_y = GAME_HEIGHT // 2
-        self.display.draw_centered_text(center_y - 2, "GAME OVER", Colors.RED)
-        self.display.draw_centered_text(center_y, f"Final Score: {self.score:06d}", Colors.YELLOW)
+        score = self.scoring.get_score()
+        high_score = self.scoring.get_high_score()
+        
+        self.display.draw_centered_text(center_y - 3, "GAME OVER", Colors.RED)
+        self.display.draw_centered_text(center_y - 1, f"Final Score: {score:06d}", Colors.YELLOW)
+        self.display.draw_centered_text(center_y, f"High Score: {high_score:06d}", Colors.CYAN)
         self.display.draw_centered_text(center_y + 2, "Press SPACE to play again", Colors.WHITE)
         self.display.draw_centered_text(center_y + 3, "Press Q to quit", Colors.WHITE)
     
     def _initialize_game(self) -> None:
         """Initialize the game objects for the current level."""
-        layout = get_level(self.level)
+        layout = get_level(self.game_state.get_level())
         self.maze = Maze(layout)
         
         # Find a good starting position for Pac-Man
@@ -460,7 +476,6 @@ class GameEngine:
     
     def reset_game(self) -> None:
         """Reset the game to initial state."""
-        self.score = 0
-        self.lives = 3
-        self.level = 1
+        self.scoring.reset()
+        self.game_state.reset()
         self._initialize_game()

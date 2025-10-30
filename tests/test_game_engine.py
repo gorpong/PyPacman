@@ -22,9 +22,9 @@ class TestGameEngine(unittest.TestCase):
         """Test initial game state."""
         self.assertEqual(self.game.state, GameState.MENU)
         self.assertTrue(self.game.running)
-        self.assertEqual(self.game.score, 0)
-        self.assertEqual(self.game.lives, 3)
-        self.assertEqual(self.game.level, 1)
+        self.assertEqual(self.game.scoring.get_score(), 0)
+        self.assertEqual(self.game.game_state.get_lives(), 3)
+        self.assertEqual(self.game.game_state.get_level(), 1)
     
     def test_quit_functionality(self):
         """Test quit functionality."""
@@ -85,16 +85,16 @@ class TestGameEngine(unittest.TestCase):
     def test_reset_game(self):
         """Test game reset functionality."""
         # Modify game state
-        self.game.score = 1000
-        self.game.lives = 1
-        self.game.level = 5
+        self.game.scoring.score = 1000
+        self.game.game_state.lives = 1
+        self.game.game_state.level = 5
         
         self.game.reset_game()
         
         # Check state is reset
-        self.assertEqual(self.game.score, 0)
-        self.assertEqual(self.game.lives, 3)
-        self.assertEqual(self.game.level, 1)
+        self.assertEqual(self.game.scoring.get_score(), 0)
+        self.assertEqual(self.game.game_state.get_lives(), 3)
+        self.assertEqual(self.game.game_state.get_level(), 1)
     
     def test_update_calls_correct_handler(self):
         """Test update calls correct state handler."""
