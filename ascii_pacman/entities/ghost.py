@@ -3,7 +3,9 @@
 from typing import Tuple, Optional
 from enum import Enum
 from .base import MovableEntity, Position
+from .pacman import PacMan
 from ..core.constants import Direction, Sprites, Colors
+from ..core.maze import Maze
 import random
 
 
@@ -57,7 +59,7 @@ class Ghost(MovableEntity):
         self.vulnerable_timer = 0.0
         self.release_timer = 0.0
         
-    def update(self, delta_time: float, maze: 'Maze', pacman: 'PacMan') -> None:
+    def update(self, delta_time: float, maze: Maze, pacman: PacMan) -> None:
         """Update ghost AI and movement."""
         # Update timers
         self.mode_timer += delta_time
@@ -78,7 +80,7 @@ class Ghost(MovableEntity):
         if self.update_movement(delta_time, maze):
             self._perform_movement(maze)
     
-    def _update_ai(self, maze, pacman):
+    def _update_ai(self, maze: Maze, pacman: PacMan) -> None:
         """Update AI target based on current mode and state."""
         if self.state == GhostState.IN_HOUSE:
             return
@@ -116,11 +118,11 @@ class Ghost(MovableEntity):
                 self.state = GhostState.IN_HOUSE
                 self.mode = GhostMode.SCATTER
     
-    def _get_chase_target(self, pacman) -> Tuple[int, int]:
+    def _get_chase_target(self, pacman: PacMan) -> Tuple[int, int]:
         """Get the target position for chase mode. Override in subclasses."""
         return pacman.get_position()
     
-    def _choose_random_target(self, maze):
+    def _choose_random_target(self, maze: Maze) -> None:
         """Choose a random direction when vulnerable."""
         directions = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
         random.shuffle(directions)
@@ -133,14 +135,14 @@ class Ghost(MovableEntity):
                 self.target = Position(new_x, new_y)
                 break
     
-    def _perform_movement(self, maze):
+    def _perform_movement(self, maze: Maze) -> None:
         """Execute movement towards target."""
         best_direction = self._get_best_direction(maze)
         
         if best_direction != Direction.NONE:
             self.move(maze, best_direction)
     
-    def _get_best_direction(self, maze) -> Tuple[int, int]:
+    def _get_best_direction(self, maze: Maze) -> Tuple[int, int]:
         """Calculate the best direction to move towards target."""
         if self.state == GhostState.IN_HOUSE:
             return Direction.NONE
@@ -227,7 +229,7 @@ class Blinky(Ghost):
         self.scatter_target = Position(70, 1)  # Top-right corner
         self.release_delay = 0.0  # First to leave house
     
-    def _get_chase_target(self, pacman) -> Tuple[int, int]:
+    def _get_chase_target(self, pacman: PacMan) -> Tuple[int, int]:
         """Blinky directly targets Pac-Man."""
         return pacman.get_position()
 
@@ -240,7 +242,7 @@ class Pinky(Ghost):
         self.scatter_target = Position(1, 1)  # Top-left corner
         self.release_delay = 2.0  # Second to leave
     
-    def _get_chase_target(self, pacman) -> Tuple[int, int]:
+    def _get_chase_target(self, pacman: PacMan) -> Tuple[int, int]:
         """Pinky targets 4 spaces ahead of Pac-Man."""
         px, py = pacman.get_position()
         dx, dy = pacman.direction
@@ -261,7 +263,7 @@ class Inky(Ghost):
         self.release_delay = 5.0  # Third to leave
         self.blinky = blinky  # Reference to Blinky for targeting
     
-    def _get_chase_target(self, pacman) -> Tuple[int, int]:
+    def _get_chase_target(self, pacman: PacMan) -> Tuple[int, int]:
         """Inky uses complex targeting based on Pac-Man and Blinky."""
         px, py = pacman.get_position()
         dx, dy = pacman.direction
@@ -291,7 +293,7 @@ class Clyde(Ghost):
         self.release_delay = 8.0  # Last to leave
         self.chase_distance_threshold = 8  # Distance threshold for behavior change
     
-    def _get_chase_target(self, pacman) -> Tuple[int, int]:
+    def _get_chase_target(self, pacman: PacMan) -> Tuple[int, int]:
         """Clyde targets Pac-Man when far, but scatters when close."""
         px, py = pacman.get_position()
         pac_pos = Position(px, py)

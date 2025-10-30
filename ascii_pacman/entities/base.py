@@ -1,8 +1,9 @@
 """Base classes for game entities."""
 
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Iterator
 from dataclasses import dataclass
 from ..core.constants import Direction
+from ..core.maze import Maze
 
 
 @dataclass
@@ -11,11 +12,11 @@ class Position:
     x: int
     y: int
     
-    def __iter__(self) -> iter:
+    def __iter__(self) -> Iterator[int]:
         """Allow unpacking as tuple."""
         return iter((self.x, self.y))
     
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compare positions."""
         if isinstance(other, Position):
             return self.x == other.x and self.y == other.y
@@ -73,7 +74,7 @@ class MovableEntity:
         self.position.x = x
         self.position.y = y
         
-    def can_move_to(self, maze: 'Maze', x: int, y: int) -> bool:
+    def can_move_to(self, maze: Maze, x: int, y: int) -> bool:
         """
         Check if entity can move to the given position.
         
@@ -87,7 +88,7 @@ class MovableEntity:
         """
         return maze.is_walkable(x, y)
     
-    def move(self, maze: 'Maze', direction: Tuple[int, int]) -> bool:
+    def move(self, maze: Maze, direction: Tuple[int, int]) -> bool:
         """
         Attempt to move in the given direction.
         
@@ -121,7 +122,7 @@ class MovableEntity:
         self.moving = False
         return False
     
-    def update_movement(self, delta_time: float, maze: 'Maze') -> bool:
+    def update_movement(self, delta_time: float, maze: Maze) -> bool:
         """
         Update movement based on speed and time.
         

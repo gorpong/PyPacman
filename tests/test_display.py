@@ -4,7 +4,7 @@ Tests for display and rendering functionality.
 
 import unittest
 from ascii_pacman.ui.display import MockDisplay
-from src.constants import GAME_WIDTH, GAME_HEIGHT, Colors
+from ascii_pacman.core.constants import GAME_WIDTH, GAME_HEIGHT, Colors
 
 
 class TestDisplay(unittest.TestCase):

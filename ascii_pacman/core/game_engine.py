@@ -5,7 +5,7 @@ from typing import Optional
 from .constants import GameState, FRAME_TIME, Colors, GAME_WIDTH, GAME_HEIGHT, Score, Sprites
 from .maze import Maze
 from ..ui import Display, InputHandler
-from ..entities import PacMan, GhostManager
+from ..entities import PacMan, GhostManager, Position
 from ..data.levels import get_level
 
 
@@ -55,7 +55,7 @@ class GameEngine:
         self.state = GameState.QUIT
         self.running = False
     
-    def run_game_loop(self):
+    def run_game_loop(self) -> None:
         """Main game loop."""
         self.last_frame_time = time.time()
         
@@ -72,7 +72,7 @@ class GameEngine:
                 # Sleep for a short time to avoid busy waiting
                 time.sleep(0.001)
     
-    def update(self, delta_time: float):
+    def update(self, delta_time: float) -> None:
         """Update game logic."""
         self.handle_input()
         
@@ -90,7 +90,7 @@ class GameEngine:
         elif self.state == GameState.QUIT:
             self.running = False
     
-    def handle_input(self):
+    def handle_input(self) -> None:
         """Process input based on current state."""
         key = self.input_handler.get_key()
         if key is None:
@@ -115,7 +115,7 @@ class GameEngine:
         if handler:
             handler(key)
     
-    def _handle_quit_confirm_input(self, key: str):
+    def _handle_quit_confirm_input(self, key: str) -> None:
         """Handle input in quit confirmation state."""
         if key == 'y':
             self.quit()
@@ -123,17 +123,17 @@ class GameEngine:
             # Return to previous state
             self.state = getattr(self, '_previous_state', GameState.MENU)
     
-    def _show_quit_confirmation(self):
+    def _show_quit_confirmation(self) -> None:
         """Show quit confirmation dialog."""
         self._previous_state = self.state
         self.state = GameState.QUIT_CONFIRM
     
-    def _handle_menu_input(self, key: str):
+    def _handle_menu_input(self, key: str) -> None:
         """Handle input in menu state."""
         if key == ' ' or key == '\n':
             self.state = GameState.PLAYING
     
-    def _handle_game_input(self, key: str):
+    def _handle_game_input(self, key: str) -> None:
         """Handle input during gameplay."""
         if self.input_handler.is_pause_key(key):
             self.state = GameState.PAUSED
@@ -143,22 +143,22 @@ class GameEngine:
             if direction != (0, 0) and self.pacman:
                 self.pacman.set_direction(direction)
     
-    def _handle_paused_input(self, key: str):
+    def _handle_paused_input(self, key: str) -> None:
         """Handle input while paused."""
         if self.input_handler.is_pause_key(key):
             self.state = GameState.PLAYING
     
-    def _handle_game_over_input(self, key: str):
+    def _handle_game_over_input(self, key: str) -> None:
         """Handle input on game over screen."""
         if key == ' ' or key == '\n':
             self.reset_game()
             self.state = GameState.PLAYING
     
-    def update_menu(self, delta_time: float):
+    def update_menu(self, delta_time: float) -> None:
         """Update menu state."""
         pass
     
-    def update_game(self, delta_time: float):
+    def update_game(self, delta_time: float) -> None:
         """Update game state."""
         if not self.pacman or not self.maze or not self.ghost_manager:
             return
@@ -187,7 +187,7 @@ class GameEngine:
         # Check ghost collisions
         self._check_ghost_collisions()
     
-    def _check_ghost_collisions(self):
+    def _check_ghost_collisions(self) -> None:
         """Check and handle ghost-Pac-Man collisions."""
         colliding_ghost = self.ghost_manager.check_collision_with_pacman(self.pacman)
         if colliding_ghost:
@@ -204,19 +204,19 @@ class GameEngine:
                     # Reset positions but keep score
                     self._reset_positions()
     
-    def update_paused(self, delta_time: float):
+    def update_paused(self, delta_time: float) -> None:
         """Update paused state."""
         pass
     
-    def update_game_over(self, delta_time: float):
+    def update_game_over(self, delta_time: float) -> None:
         """Update game over state."""
         pass
     
-    def update_quit_confirm(self, delta_time: float):
+    def update_quit_confirm(self, delta_time: float) -> None:
         """Update quit confirmation state."""
         pass
     
-    def render(self):
+    def render(self) -> None:
         """Render the current game state."""
         self.display.clear_buffer()
         
@@ -234,21 +234,21 @@ class GameEngine:
         
         self.display.render()
     
-    def _render_playing(self):
+    def _render_playing(self) -> None:
         """Render the playing state."""
         self.render_game()
     
-    def _render_paused(self):
+    def _render_paused(self) -> None:
         """Render the paused state."""
         self.render_game()
         self.render_pause_overlay()
     
-    def _render_quit_confirm(self):
+    def _render_quit_confirm(self) -> None:
         """Render the quit confirmation state."""
         self.render_game()
         self.render_quit_confirm()
     
-    def render_menu(self):
+    def render_menu(self) -> None:
         """Render the main menu."""
         self.display.draw_border()
         
@@ -263,7 +263,7 @@ class GameEngine:
         start_y = controls_y + 5
         self.display.draw_centered_text(start_y, "Press SPACE to start!", Colors.YELLOW)
     
-    def render_game(self):
+    def render_game(self) -> None:
         """Render the main game."""
         self.display.draw_border()
         
@@ -284,7 +284,7 @@ class GameEngine:
         if self.ghost_manager:
             self._render_ghosts()
     
-    def _render_maze(self):
+    def _render_maze(self) -> None:
         """Render the maze on the display."""
         # Calculate centered position
         maze_start_y = 3
@@ -309,7 +309,7 @@ class GameEngine:
         }
         return color_map.get(char, Colors.WHITE)
     
-    def _render_pacman(self):
+    def _render_pacman(self) -> None:
         """Render Pac-Man on the display."""
         if not self.pacman or not self.maze:
             return
@@ -326,7 +326,7 @@ class GameEngine:
         sprite = self.pacman.get_sprite()
         self.display.set_char(screen_x, screen_y, sprite, Colors.YELLOW)
     
-    def _render_ghosts(self):
+    def _render_ghosts(self) -> None:
         """Render all ghosts on the display."""
         if not self.ghost_manager or not self.maze:
             return
@@ -341,7 +341,7 @@ class GameEngine:
             screen_y = maze_start_y + y
             self.display.set_char(screen_x, screen_y, sprite, color)
     
-    def render_pause_overlay(self):
+    def render_pause_overlay(self) -> None:
         """Render pause overlay with centered dialog box."""
         from ..core.constants import BorderChars
         
@@ -351,7 +351,7 @@ class GameEngine:
             28, 4
         )
     
-    def render_quit_confirm(self):
+    def render_quit_confirm(self) -> None:
         """Render quit confirmation overlay with centered dialog box."""
         self._render_dialog_box(
             "Are you sure you want to quit?",
@@ -400,7 +400,7 @@ class GameEngine:
         self.display.set_char(x, y + height - 1, BorderChars.BOTTOM_LEFT, color)
         self.display.set_char(x + width - 1, y + height - 1, BorderChars.BOTTOM_RIGHT, color)
     
-    def render_game_over(self):
+    def render_game_over(self) -> None:
         """Render game over screen."""
         self.display.draw_border()
         
@@ -410,7 +410,7 @@ class GameEngine:
         self.display.draw_centered_text(center_y + 2, "Press SPACE to play again", Colors.WHITE)
         self.display.draw_centered_text(center_y + 3, "Press Q to quit", Colors.WHITE)
     
-    def _initialize_game(self):
+    def _initialize_game(self) -> None:
         """Initialize the game objects for the current level."""
         layout = get_level(self.level)
         self.maze = Maze(layout)
@@ -422,7 +422,7 @@ class GameEngine:
         # Initialize ghost manager
         self.ghost_manager = GhostManager(self.maze)
     
-    def _find_pacman_start_position(self):
+    def _find_pacman_start_position(self) -> Position:
         """Find a suitable starting position for Pac-Man."""
         from ..entities.base import Position
         
@@ -451,14 +451,14 @@ class GameEngine:
         
         return Position(1, 1)  # Default fallback
     
-    def _reset_positions(self):
+    def _reset_positions(self) -> None:
         """Reset Pac-Man and ghost positions after death."""
         if self.pacman:
             self.pacman.reset()
         if self.ghost_manager:
             self.ghost_manager.reset()
     
-    def reset_game(self):
+    def reset_game(self) -> None:
         """Reset the game to initial state."""
         self.score = 0
         self.lives = 3

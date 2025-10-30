@@ -3,6 +3,7 @@
 from typing import Tuple
 from .base import MovableEntity
 from ..core.constants import Direction, Sprites
+from ..core.maze import Maze
 
 
 class PacMan(MovableEntity):
@@ -39,7 +40,7 @@ class PacMan(MovableEntity):
         if direction != Direction.NONE:
             self.next_direction = direction
             
-    def update(self, delta_time: float, maze: 'Maze') -> None:
+    def update(self, delta_time: float, maze: Maze) -> None:
         """
         Update Pac-Man's position and animation.
         

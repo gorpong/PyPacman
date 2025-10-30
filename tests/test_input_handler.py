@@ -4,7 +4,7 @@ Tests for input handling functionality.
 
 import unittest
 from ascii_pacman.ui.input_handler import MockInputHandler
-from src.constants import Keys, Direction
+from ascii_pacman.core.constants import Keys, Direction
 
 
 class TestInputHandler(unittest.TestCase):

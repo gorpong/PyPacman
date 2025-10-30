@@ -2,14 +2,16 @@
 
 from typing import List, Optional, Tuple
 from .ghost import Ghost, Blinky, Pinky, Inky, Clyde, GhostMode, GhostState
+from .pacman import PacMan
 from .base import Position
 from ..core.constants import GHOST_VULNERABLE_DURATION
+from ..core.maze import Maze
 
 
 class GhostManager:
     """Manages all four ghosts and their coordinated behaviors."""
     
-    def __init__(self, maze):
+    def __init__(self, maze: Maze):
         """Initialize the ghost manager with ghost starting positions."""
         # Find ghost house position
         ghost_house_pos = self._find_ghost_house_center(maze)
@@ -40,7 +42,7 @@ class GhostManager:
         # Track eaten ghosts for scoring
         self.ghosts_eaten_in_sequence = 0
         
-    def _find_ghost_house_center(self, maze) -> Position:
+    def _find_ghost_house_center(self, maze: Maze) -> Position:
         """Find the center of the ghost house in the maze."""
         ghost_positions = []
         
@@ -59,7 +61,7 @@ class GhostManager:
         # Fallback to center of maze
         return Position(maze.width // 2, maze.height // 2)
     
-    def reset(self):
+    def reset(self) -> None:
         """Reset all ghosts to starting state."""
         for ghost in self.ghosts:
             ghost.reset()
@@ -69,7 +71,7 @@ class GhostManager:
         self.current_mode_duration = self.mode_sequence[0][1]
         self.ghosts_eaten_in_sequence = 0
     
-    def update(self, delta_time: float, maze, pacman):
+    def update(self, delta_time: float, maze: Maze, pacman: PacMan) -> None:
         """Update all ghosts and mode timing."""
         # Update global mode timing
         self.mode_timer += delta_time
@@ -95,19 +97,19 @@ class GhostManager:
         for ghost in self.ghosts:
             ghost.update(delta_time, maze, pacman)
     
-    def _set_all_ghost_mode(self, mode: GhostMode):
+    def _set_all_ghost_mode(self, mode: GhostMode) -> None:
         """Set mode for all active ghosts."""
         for ghost in self.ghosts:
             if ghost.mode != GhostMode.VULNERABLE and ghost.mode != GhostMode.EATEN:
                 ghost.set_mode(mode)
     
-    def make_all_vulnerable(self):
+    def make_all_vulnerable(self) -> None:
         """Make all ghosts vulnerable after power pellet consumption."""
         for ghost in self.ghosts:
             ghost.make_vulnerable(GHOST_VULNERABLE_DURATION)
         self.ghosts_eaten_in_sequence = 0  # Reset the counter
     
-    def check_collision_with_pacman(self, pacman) -> Optional[Ghost]:
+    def check_collision_with_pacman(self, pacman: PacMan) -> Optional[Ghost]:
         """Check if any ghost collides with Pac-Man."""
         px, py = pacman.get_position()
         
