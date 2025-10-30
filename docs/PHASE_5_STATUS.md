@@ -1,13 +1,15 @@
-# Phase 5: Game Logic and Polish - Status
+# Phase 5: Game Logic and Polish - COMPLETE ✅
 
-## Completed Features ✅
+## Completed Features
 
 ### Scoring System
 - ✅ Dot scoring (10 points each)
 - ✅ Power pellet scoring (50 points each)
 - ✅ Progressive ghost scoring (200, 400, 800, 1600)
 - ✅ Ghost combo resets when vulnerability expires
-- ✅ High score tracking
+- ✅ High score tracking with top 10 leaderboard
+- ✅ **High score persistence** to ~/.ascii_pacman_scores.json
+- ✅ **Player name entry** for high scores
 
 ### Lives System
 - ✅ 3 starting lives
@@ -15,6 +17,7 @@
 - ✅ Game over when lives reach 0
 - ✅ Position reset after death (keeps score)
 - ✅ Lives display in HUD
+- ✅ **Death pause effect** (1.5s pause when killed)
 
 ### Level Progression
 - ✅ Level advances when all dots collected
@@ -22,23 +25,44 @@
 - ✅ Level counter in HUD
 - ✅ Pac-Man also speeds up slightly per level
 
+### Visual Effects (ASCII-based)
+- ✅ **Score popups** when eating power pellets ("+50")
+- ✅ **Score popups** when eating ghosts ("+200", "+400", "+800", "+1600")
+- ✅ **Death animation** (pause before respawn)
+- ✅ **High score entry screen** with blinking cursor
+- ✅ Name input box with visual feedback
+
 ### UI Improvements
 - ✅ Score display (6 digits)
-- ✅ High score display
+- ✅ High score display in HUD
 - ✅ Lives counter
 - ✅ Level counter
 - ✅ Game over screen shows final and high score
+- ✅ High score entry prompt on new record
+
+### Bug Fixes
+- ✅ **Fixed ghost eating lag** - Pac-Man can now eat multiple ghosts in sequence
+- ✅ **Fixed collision detection** - Only ACTIVE ghosts collide with Pac-Man
+- ✅ **Fixed ghost walking-through bug** - Eaten ghosts properly ignored
 
 ## Testing
-- ✅ 77 tests passing (14 new tests for scoring and game state)
-- ✅ All existing tests still working
+- ✅ 77 tests passing
+- ✅ All existing tests maintained
+- ✅ New high score functionality tested
 
-## Current Status
-Phase 5 core systems complete. Game now has full scoring, lives, and level progression. Ready for merge to master.
+## Technical Implementation
+- High scores stored as JSON in home directory
+- Top 10 scores maintained with player names
+- Score popups rendered at entity positions
+- Death timer prevents update during animation
+- Ghost collision only checks ACTIVE state
+- Blinking cursor effect using time-based toggle
 
-## Next Steps (Optional Polish)
-- High score persistence to file
-- Better death animation/effect
-- Level complete celebration screen
-- Fruit/bonus items
-- More visual polish
+## Ready for Review
+Phase 5 is complete with all requested features:
+1. ✅ High score persistence with player names
+2. ✅ ASCII-based visual effects for key events
+3. ✅ Ghost eating bug fixed
+
+Branch: `phase-5-gameplay`
+Status: **Awaiting approval to merge to master**
