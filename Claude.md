@@ -161,7 +161,7 @@ ascii-pacman/
 Each phase is estimated to be completed in sequence, with the foundation being the most critical for establishing the architecture that all subsequent phases will build upon.
 
 ## Current Status
-**Phase 5: Game Logic and Polish - COMPLETE, AWAITING APPROVAL**
+**Phase 6: Final Integration and Testing - COMPLETE, AWAITING APPROVAL**
 
 ### Completed Phases:
 ✅ **Phase 1: Foundation and Game Engine** - Merged to master
@@ -169,21 +169,21 @@ Each phase is estimated to be completed in sequence, with the foundation being t
 ✅ **Phase 3: Pac-Man Character** - Merged to master
 ✅ **Phase 4: Ghost AI** - Merged to master
 ✅ **Refactoring: Package Structure** - Merged to master
-✅ **Phase 5: Game Logic and Polish** - Complete on branch, awaiting review
+✅ **Phase 5: Game Logic and Polish** - Merged to master
+✅ **Phase 6: Final Integration** - Complete on branch, awaiting review
 
-### Phase 5: Game Logic and Polish - COMPLETED ✅
-Full gameplay systems implemented:
-- ✅ **Scoring System** - Dots (10pts), pellets (50pts), progressive ghost scoring (200/400/800/1600)
-- ✅ **Lives System** - 3 lives, death handling, respawn mechanics
-- ✅ **Level Progression** - Difficulty scaling, speed multipliers
-- ✅ **High Score Persistence** - Top 10 saved to ~/.ascii_pacman_scores.json with player names
-- ✅ **Visual Effects** - Score popups for pellets and ghosts, death pause animation
-- ✅ **Bug Fixes** - Fixed ghost eating lag, collision detection improvements
-- ✅ **Enhanced UI** - High score entry screen, blinking cursor, score/lives/level display
-- ✅ **Comprehensive Testing** - 77 tests passing
+### Phase 6: Final Integration and Testing - COMPLETED ✅
+Final polish and testing:
+- ✅ **Scrolling High Scores** - Arcade-style display on splash screen after 10s idle
+- ✅ **Test Coverage** - Expanded from 77 to 84 tests
+- ✅ **Integration Testing** - Comprehensive unit test coverage of all systems
+- ✅ **Code Review** - All major systems have thorough test coverage
+- ✅ **Ghost Manager Tests** - Added tests for all public methods
+- ✅ **Menu System Tests** - Added idle timer and scroll animation tests
 
-**Current Branch**: `phase-5-gameplay`
+**Current Branch**: `phase-6-final`
 **Status**: Complete and ready for review
+**Tests**: 84/84 passing
 **Awaiting**: Approval to merge to master
 
 ## Documentation Maintenance 📚
