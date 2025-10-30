@@ -218,6 +218,73 @@ class TestGhostManager(unittest.TestCase):
         for ghost in self.ghost_manager.ghosts:
             self.assertEqual(ghost.state, GhostState.IN_HOUSE)
             self.assertEqual(ghost.mode, GhostMode.SCATTER)
+    
+    def test_get_ghost_positions(self):
+        """Test getting ghost positions for rendering."""
+        positions = self.ghost_manager.get_ghost_positions()
+        
+        # Should return 4 positions
+        self.assertEqual(len(positions), 4)
+        
+        # Each position should have x, y, sprite, color
+        for x, y, sprite, color in positions:
+            self.assertIsInstance(x, int)
+            self.assertIsInstance(y, int)
+            self.assertIsInstance(sprite, str)
+            self.assertIsInstance(color, str)
+    
+    def test_get_vulnerable_ghosts(self):
+        """Test getting list of vulnerable ghosts."""
+        # Make some ghosts vulnerable
+        self.ghost_manager.ghosts[0].state = GhostState.ACTIVE
+        self.ghost_manager.ghosts[1].state = GhostState.ACTIVE
+        
+        self.ghost_manager.ghosts[0].make_vulnerable(5.0)
+        self.ghost_manager.ghosts[1].make_vulnerable(5.0)
+        
+        vulnerable = self.ghost_manager.get_vulnerable_ghosts()
+        self.assertEqual(len(vulnerable), 2)
+    
+    def test_get_dangerous_ghosts(self):
+        """Test getting list of dangerous ghosts."""
+        # Make ghosts active and dangerous
+        for ghost in self.ghost_manager.ghosts:
+            ghost.state = GhostState.ACTIVE
+            ghost.mode = GhostMode.CHASE
+        
+        dangerous = self.ghost_manager.get_dangerous_ghosts()
+        self.assertEqual(len(dangerous), 4)
+    
+    def test_eat_ghost_scoring(self):
+        """Test progressive scoring when eating ghosts."""
+        ghost = self.ghost_manager.ghosts[0]
+        ghost.state = GhostState.ACTIVE
+        ghost.make_vulnerable(5.0)
+        
+        # First ghost: 200
+        score1 = self.ghost_manager.eat_ghost(ghost)
+        self.assertEqual(score1, 200)
+        
+        # Second ghost
+        ghost2 = self.ghost_manager.ghosts[1]
+        ghost2.state = GhostState.ACTIVE
+        ghost2.make_vulnerable(5.0)
+        score2 = self.ghost_manager.eat_ghost(ghost2)
+        self.assertEqual(score2, 400)
+        
+        # Third ghost
+        ghost3 = self.ghost_manager.ghosts[2]
+        ghost3.state = GhostState.ACTIVE
+        ghost3.make_vulnerable(5.0)
+        score3 = self.ghost_manager.eat_ghost(ghost3)
+        self.assertEqual(score3, 800)
+        
+        # Fourth ghost
+        ghost4 = self.ghost_manager.ghosts[3]
+        ghost4.state = GhostState.ACTIVE
+        ghost4.make_vulnerable(5.0)
+        score4 = self.ghost_manager.eat_ghost(ghost4)
+        self.assertEqual(score4, 1600)
 
 
 if __name__ == '__main__':

@@ -41,6 +41,11 @@ class GameEngine:
         self.score_popup = None  # (text, x, y, timer)
         self.death_timer = 0.0
         
+        # Menu state
+        self.menu_idle_timer = 0.0
+        self.show_high_scores = False
+        self.high_score_scroll_offset = 0.0
+        
         self._initialize_game()
         
     def start(self) -> None:
@@ -141,8 +146,18 @@ class GameEngine:
     
     def _handle_menu_input(self, key: str) -> None:
         """Handle input in menu state."""
+        # If showing high scores, any key dismisses them
+        if self.show_high_scores:
+            self.show_high_scores = False
+            self.menu_idle_timer = 0.0
+            self.high_score_scroll_offset = 0.0
+            return
+        
+        # Otherwise, space starts the game
         if key == ' ' or key == '\n':
             self.state = GameState.PLAYING
+            self.menu_idle_timer = 0.0
+            self.show_high_scores = False
     
     def _handle_game_input(self, key: str) -> None:
         """Handle input during gameplay."""
@@ -180,7 +195,17 @@ class GameEngine:
     
     def update_menu(self, delta_time: float) -> None:
         """Update menu state."""
-        pass
+        # Track idle time
+        self.menu_idle_timer += delta_time
+        
+        # Show high scores after 10 seconds of inactivity
+        if self.menu_idle_timer >= 10.0 and not self.show_high_scores:
+            self.show_high_scores = True
+            self.high_score_scroll_offset = 0.0
+        
+        # Animate scroll if showing high scores
+        if self.show_high_scores:
+            self.high_score_scroll_offset += delta_time * 2.0  # Scroll speed
     
     def update_game(self, delta_time: float) -> None:
         """Update game state."""
@@ -310,16 +335,61 @@ class GameEngine:
         """Render the main menu."""
         self.display.draw_border()
         
-        title_y = 8
-        self.display.draw_centered_text(title_y, "ASCII PAC-MAN", Colors.YELLOW)
+        if self.show_high_scores:
+            self._render_scrolling_high_scores()
+        else:
+            title_y = 8
+            self.display.draw_centered_text(title_y, "ASCII PAC-MAN", Colors.YELLOW)
+            
+            controls_y = title_y + 4
+            self.display.draw_centered_text(controls_y, "Controls:", Colors.WHITE)
+            self.display.draw_centered_text(controls_y + 1, "Arrow Keys or WASD to move", Colors.WHITE)
+            self.display.draw_centered_text(controls_y + 2, "SPACE to pause, Q to quit", Colors.WHITE)
+            
+            start_y = controls_y + 5
+            self.display.draw_centered_text(start_y, "Press SPACE to start!", Colors.YELLOW)
+    
+    def _render_scrolling_high_scores(self) -> None:
+        """Render scrolling high scores display."""
+        # Title
+        self.display.draw_centered_text(3, "HIGH SCORES", Colors.YELLOW)
         
-        controls_y = title_y + 4
-        self.display.draw_centered_text(controls_y, "Controls:", Colors.WHITE)
-        self.display.draw_centered_text(controls_y + 1, "Arrow Keys or WASD to move", Colors.WHITE)
-        self.display.draw_centered_text(controls_y + 2, "SPACE to pause, Q to quit", Colors.WHITE)
+        # Get high scores
+        high_scores = self.scoring.get_high_scores()
         
-        start_y = controls_y + 5
-        self.display.draw_centered_text(start_y, "Press SPACE to start!", Colors.YELLOW)
+        if not high_scores:
+            self.display.draw_centered_text(10, "No high scores yet!", Colors.WHITE)
+            self.display.draw_centered_text(GAME_HEIGHT - 3, "Press any key to continue", Colors.CYAN)
+            return
+        
+        # Calculate scroll position (loop the list)
+        scroll_lines = int(self.high_score_scroll_offset)
+        
+        # Display area (rows 5 to HEIGHT-5)
+        display_start = 5
+        display_end = GAME_HEIGHT - 5
+        display_height = display_end - display_start
+        
+        # Render visible scores with scrolling
+        for i in range(display_height):
+            score_index = (scroll_lines + i) % len(high_scores)
+            name, points = high_scores[score_index]
+            
+            # Format: rank. name  score
+            rank = score_index + 1
+            score_text = f"{rank:2}. {name[:15]:15} {points:06d}"
+            
+            y_pos = display_start + i
+            if display_start <= y_pos < display_end:
+                # Fade effect at edges
+                if i == 0 or i == display_height - 1:
+                    color = Colors.WHITE
+                else:
+                    color = Colors.CYAN
+                self.display.draw_centered_text(y_pos, score_text, color)
+        
+        # Instructions
+        self.display.draw_centered_text(GAME_HEIGHT - 3, "Press any key to continue", Colors.YELLOW)
     
     def render_game(self) -> None:
         """Render the main game."""

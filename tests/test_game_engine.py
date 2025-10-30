@@ -25,6 +25,8 @@ class TestGameEngine(unittest.TestCase):
         self.assertEqual(self.game.scoring.get_score(), 0)
         self.assertEqual(self.game.game_state.get_lives(), 3)
         self.assertEqual(self.game.game_state.get_level(), 1)
+        self.assertFalse(self.game.show_high_scores)
+        self.assertEqual(self.game.menu_idle_timer, 0.0)
     
     def test_quit_functionality(self):
         """Test quit functionality."""
@@ -166,6 +168,47 @@ class TestGameEngine(unittest.TestCase):
         self.game.handle_input()
         
         self.assertEqual(self.game.state, GameState.PLAYING)
+    
+    def test_menu_idle_timer(self):
+        """Test menu idle timer triggers high scores."""
+        self.game.state = GameState.MENU
+        self.assertFalse(self.game.show_high_scores)
+        
+        # Update menu for 11 seconds
+        for _ in range(11):
+            self.game.update_menu(1.0)
+        
+        # Should trigger high scores display
+        self.assertTrue(self.game.show_high_scores)
+        self.assertGreater(self.game.menu_idle_timer, 10.0)
+    
+    def test_menu_high_scores_dismiss(self):
+        """Test that any key dismisses high scores."""
+        self.game.state = GameState.MENU
+        self.game.show_high_scores = True
+        self.game.menu_idle_timer = 15.0
+        
+        # Press any key
+        self.input_handler.add_key('a')
+        self.game.handle_input()
+        
+        # Should dismiss high scores
+        self.assertFalse(self.game.show_high_scores)
+        self.assertEqual(self.game.menu_idle_timer, 0.0)
+        # Should still be in menu state
+        self.assertEqual(self.game.state, GameState.MENU)
+    
+    def test_menu_scroll_animation(self):
+        """Test high score scroll animation."""
+        self.game.state = GameState.MENU
+        self.game.show_high_scores = True
+        initial_offset = self.game.high_score_scroll_offset
+        
+        # Update menu to animate scroll
+        self.game.update_menu(1.0)
+        
+        # Scroll offset should increase
+        self.assertGreater(self.game.high_score_scroll_offset, initial_offset)
 
 
 if __name__ == '__main__':
