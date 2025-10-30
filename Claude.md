@@ -161,52 +161,30 @@ ascii-pacman/
 Each phase is estimated to be completed in sequence, with the foundation being the most critical for establishing the architecture that all subsequent phases will build upon.
 
 ## Current Status
-**Phase 4: Ghost AI - IN PROGRESS**
-Phase 2 (Maze and World) and Phase 3 (Pac-Man Character) have been completed and merged to master.
+**Phase 5: Game Logic and Polish - COMPLETE, AWAITING APPROVAL**
 
 ### Completed Phases:
-✅ **Phase 1: Foundation and Game Engine** - Complete
-✅ **Phase 2: Maze and World** - Complete  
-✅ **Phase 3: Pac-Man Character** - Complete
+✅ **Phase 1: Foundation and Game Engine** - Merged to master
+✅ **Phase 2: Maze and World** - Merged to master
+✅ **Phase 3: Pac-Man Character** - Merged to master
+✅ **Phase 4: Ghost AI** - Merged to master
+✅ **Refactoring: Package Structure** - Merged to master
+✅ **Phase 5: Game Logic and Polish** - Complete on branch, awaiting review
 
-### Phase 2 & 3 Achievements:
-✅ **Arrow Key Detection** - Fixed input handler for responsive controls
-✅ **Constants Refactoring** - Centralized all display constants
-✅ **Maze System** - 74x20 properly connected maze with 470 dots + 4 pellets
-✅ **Pac-Man Implementation** - Full character with movement, animation, collision
-✅ **Dot Collection** - Working scoring system with proper mechanics
-✅ **Game States** - Menu, playing, paused, quit confirmation all working
-✅ **Comprehensive Testing** - 52 tests passing
+### Phase 5: Game Logic and Polish - COMPLETED ✅
+Full gameplay systems implemented:
+- ✅ **Scoring System** - Dots (10pts), pellets (50pts), progressive ghost scoring (200/400/800/1600)
+- ✅ **Lives System** - 3 lives, death handling, respawn mechanics
+- ✅ **Level Progression** - Difficulty scaling, speed multipliers
+- ✅ **High Score Persistence** - Top 10 saved to ~/.ascii_pacman_scores.json with player names
+- ✅ **Visual Effects** - Score popups for pellets and ghosts, death pause animation
+- ✅ **Bug Fixes** - Fixed ghost eating lag, collision detection improvements
+- ✅ **Enhanced UI** - High score entry screen, blinking cursor, score/lives/level display
+- ✅ **Comprehensive Testing** - 77 tests passing
 
-### Phase 4: Ghost AI - COMPLETED ✅
-Fully implemented four-ghost AI system with classic Pac-Man behaviors:
-- ✅ **Basic Ghost class** - Movement, rendering, state management  
-- ✅ **Ghost house mechanics** - Timed release sequence (0s, 2s, 5s, 8s)
-- ✅ **Individual AI personalities**:
-  - **Blinky (Red)**: Direct aggressive chaser
-  - **Pinky (Pink)**: Ambusher (targets 4 spaces ahead)  
-  - **Inky (Cyan)**: Complex targeting (patrol/ambush hybrid)
-  - **Clyde (Orange)**: Distance-based behavior (chase when far, scatter when close)
-- ✅ **Mode switching** - Scatter/Chase alternating with proper timings
-- ✅ **Power pellet vulnerability** - 8-second vulnerable state with visual changes
-- ✅ **Collision detection** - Ghost-Pac-Man interactions
-- ✅ **Complete mechanics** - Death, respawn, ghost eating with progressive scoring
-- ✅ **Comprehensive testing** - 63 tests passing including ghost AI suite
-
-### Refactoring Complete ✅
-Major codebase improvements implemented:
-- **Proper Python Package Structure**: Now installable via `pip install -e .`
-- **PyPI Ready**: setup.py and pyproject.toml configured for distribution
-- **Console Entry Point**: `ascii-pacman` command available after installation
-- **Code Organization**: Separated into core/, entities/, ui/, and data/ modules
-- **Base Classes**: MovableEntity eliminates code duplication
-- **Dynamic Calculations**: No more hardcoded positions (e.g., maze center)
-- **Clean Imports**: No more sys.path manipulation
-- **Better Ghost AI**: Improved targeting with Position class
-- **Maintainable Architecture**: Clear separation of concerns
-
-**Status**: Refactoring complete, ready for Phase 5 (Game Logic and Polish)
-**Current Branch**: `refactor-package-structure`
+**Current Branch**: `phase-5-gameplay`
+**Status**: Complete and ready for review
+**Awaiting**: Approval to merge to master
 
 ## Documentation Maintenance 📚
 **IMPORTANT**: Always keep README.md and Claude.md files up to date when making changes that affect:
