@@ -44,8 +44,8 @@ class TestGhost(unittest.TestCase):
         """Test basic ghost initialization."""
         ghost = Blinky(10, 7)
         
-        self.assertEqual(ghost.x, 10)
-        self.assertEqual(ghost.y, 7)
+        self.assertEqual(ghost.position.x, 10)
+        self.assertEqual(ghost.position.y, 7)
         self.assertEqual(ghost.color, Colors.RED)
         self.assertEqual(ghost.name, "Blinky")
         self.assertEqual(ghost.state, GhostState.IN_HOUSE)
@@ -111,8 +111,8 @@ class TestGhost(unittest.TestCase):
         ghost = Blinky(10, 7)
         
         # Change state
-        ghost.x = 15
-        ghost.y = 15
+        ghost.position.x = 15
+        ghost.position.y = 15
         ghost.mode = GhostMode.CHASE
         ghost.state = GhostState.ACTIVE
         
@@ -120,8 +120,8 @@ class TestGhost(unittest.TestCase):
         ghost.reset()
         
         # Should be back to original state
-        self.assertEqual(ghost.x, 10)
-        self.assertEqual(ghost.y, 7)
+        self.assertEqual(ghost.position.x, 10)
+        self.assertEqual(ghost.position.y, 7)
         self.assertEqual(ghost.mode, GhostMode.SCATTER)
         self.assertEqual(ghost.state, GhostState.IN_HOUSE)
 
@@ -178,8 +178,8 @@ class TestGhostManager(unittest.TestCase):
         # Move a ghost to Pac-Man's position
         test_ghost = self.ghost_manager.ghosts[0]
         px, py = self.pacman.get_position()
-        test_ghost.x = px
-        test_ghost.y = py
+        test_ghost.position.x = px
+        test_ghost.position.y = py
         
         colliding_ghost = self.ghost_manager.check_collision_with_pacman(self.pacman)
         self.assertEqual(colliding_ghost, test_ghost)
@@ -189,8 +189,8 @@ class TestGhostManager(unittest.TestCase):
         # Ensure no ghost is at Pac-Man's position
         px, py = self.pacman.get_position()
         for ghost in self.ghost_manager.ghosts:
-            ghost.x = 1
-            ghost.y = 1
+            ghost.position.x = 1
+            ghost.position.y = 1
         
         colliding_ghost = self.ghost_manager.check_collision_with_pacman(self.pacman)
         self.assertIsNone(colliding_ghost)
@@ -199,7 +199,7 @@ class TestGhostManager(unittest.TestCase):
         """Test resetting all ghosts."""
         # Change all ghost states
         for ghost in self.ghost_manager.ghosts:
-            ghost.x = 20
+            ghost.position.x = 20
             ghost.mode = GhostMode.CHASE
             ghost.state = GhostState.ACTIVE
         
