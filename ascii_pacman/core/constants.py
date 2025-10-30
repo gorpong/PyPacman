@@ -18,6 +18,7 @@ class GameState:
     PLAYING = "playing"
     PAUSED = "paused"
     GAME_OVER = "game_over"
+    HIGH_SCORE_ENTRY = "high_score_entry"
     QUIT_CONFIRM = "quit_confirm"
     QUIT = "quit"
 

@@ -1,6 +1,9 @@
 """Scoring system for ASCII Pac-Man."""
 
-from typing import Optional
+import os
+import json
+from typing import Optional, List, Tuple
+from pathlib import Path
 
 
 class ScoringSystem:
@@ -14,8 +17,31 @@ class ScoringSystem:
     def __init__(self):
         """Initialize scoring system."""
         self.score = 0
-        self.high_score = 0
         self.ghosts_eaten_combo = 0  # Resets when power pellet wears off
+        
+        # High score file location (hidden file in home directory)
+        self.high_score_file = Path.home() / ".ascii_pacman_scores.json"
+        self.high_scores = self._load_high_scores()
+        
+    def _load_high_scores(self) -> List[Tuple[str, int]]:
+        """Load high scores from file."""
+        if self.high_score_file.exists():
+            try:
+                with open(self.high_score_file, 'r') as f:
+                    data = json.load(f)
+                    return [(entry['name'], entry['score']) for entry in data]
+            except (json.JSONDecodeError, KeyError, IOError):
+                return []
+        return []
+    
+    def _save_high_scores(self) -> None:
+        """Save high scores to file."""
+        try:
+            data = [{'name': name, 'score': score} for name, score in self.high_scores]
+            with open(self.high_score_file, 'w') as f:
+                json.dump(data, f, indent=2)
+        except IOError:
+            pass  # Silently fail if can't save
         
     def reset(self) -> None:
         """Reset score for new game."""
@@ -44,17 +70,52 @@ class ScoringSystem:
         """Reset ghost combo counter (when power pellet wears off)."""
         self.ghosts_eaten_combo = 0
         
-    def update_high_score(self) -> bool:
-        """Update high score if current score is higher."""
-        if self.score > self.high_score:
-            self.high_score = self.score
-            return True
-        return False
+    def is_high_score(self) -> bool:
+        """Check if current score qualifies as a high score."""
+        if not self.high_scores or len(self.high_scores) < 10:
+            return self.score > 0
+        return self.score > self.high_scores[-1][1]
+    
+    def add_high_score(self, name: str) -> int:
+        """
+        Add a high score entry.
+        
+        Args:
+            name: Player name/initials
+            
+        Returns:
+            Rank (1-10) of the new score, or 0 if not in top 10
+        """
+        # Add new score
+        self.high_scores.append((name, self.score))
+        
+        # Sort by score descending
+        self.high_scores.sort(key=lambda x: x[1], reverse=True)
+        
+        # Keep only top 10
+        rank = 0
+        for i, (n, s) in enumerate(self.high_scores[:10]):
+            if n == name and s == self.score:
+                rank = i + 1
+                break
+        
+        self.high_scores = self.high_scores[:10]
+        
+        # Save to file
+        self._save_high_scores()
+        
+        return rank
         
     def get_score(self) -> int:
         """Get current score."""
         return self.score
         
     def get_high_score(self) -> int:
-        """Get high score."""
-        return self.high_score
+        """Get the highest score."""
+        if self.high_scores:
+            return self.high_scores[0][1]
+        return 0
+    
+    def get_high_scores(self) -> List[Tuple[str, int]]:
+        """Get all high scores."""
+        return self.high_scores.copy()

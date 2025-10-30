@@ -175,8 +175,9 @@ class TestGhostManager(unittest.TestCase):
     
     def test_collision_detection(self):
         """Test collision detection with Pac-Man."""
-        # Move a ghost to Pac-Man's position
+        # Move a ghost to Pac-Man's position and make it active
         test_ghost = self.ghost_manager.ghosts[0]
+        test_ghost.state = GhostState.ACTIVE  # Must be active to collide
         px, py = self.pacman.get_position()
         test_ghost.position.x = px
         test_ghost.position.y = py

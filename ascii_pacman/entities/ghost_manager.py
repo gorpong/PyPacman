@@ -120,7 +120,8 @@ class GhostManager:
         px, py = pacman.get_position()
         
         for ghost in self.ghosts:
-            if ghost.collides_with(px, py):
+            # Only check collision for ghosts that are active (not eaten or returning)
+            if ghost.state == GhostState.ACTIVE and ghost.collides_with(px, py):
                 return ghost
         
         return None

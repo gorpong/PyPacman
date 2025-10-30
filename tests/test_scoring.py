@@ -1,6 +1,9 @@
 """Tests for scoring system."""
 
 import unittest
+import os
+import tempfile
+from pathlib import Path
 from ascii_pacman.core.scoring import ScoringSystem
 
 
@@ -9,7 +12,19 @@ class TestScoringSystem(unittest.TestCase):
     
     def setUp(self):
         """Set up test fixtures."""
+        # Use a temporary file for testing
+        self.temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json')
+        self.temp_file.close()
+        
         self.scoring = ScoringSystem()
+        self.scoring.high_score_file = Path(self.temp_file.name)
+        self.scoring.high_scores = []
+    
+    def tearDown(self):
+        """Clean up test fixtures."""
+        # Remove temp file
+        if os.path.exists(self.temp_file.name):
+            os.unlink(self.temp_file.name)
     
     def test_initialization(self):
         """Test scoring system initializes correctly."""
@@ -72,9 +87,12 @@ class TestScoringSystem(unittest.TestCase):
         self.scoring.add_dot()
         self.assertEqual(self.scoring.get_score(), 20)
         
-        # Update high score
-        updated = self.scoring.update_high_score()
-        self.assertTrue(updated)
+        # Check if it's a high score
+        self.assertTrue(self.scoring.is_high_score())
+        
+        # Add high score
+        rank = self.scoring.add_high_score("TEST")
+        self.assertGreater(rank, 0)
         self.assertEqual(self.scoring.get_high_score(), 20)
         
         # Reset score
@@ -82,11 +100,8 @@ class TestScoringSystem(unittest.TestCase):
         self.assertEqual(self.scoring.get_score(), 0)
         self.assertEqual(self.scoring.get_high_score(), 20)  # High score persists
         
-        # Score less than high score
-        self.scoring.add_dot()
-        updated = self.scoring.update_high_score()
-        self.assertFalse(updated)
-        self.assertEqual(self.scoring.get_high_score(), 20)
+        # Score of 0 shouldn't be high score if we have scores
+        self.assertFalse(self.scoring.is_high_score())
     
     def test_reset(self):
         """Test reset functionality."""

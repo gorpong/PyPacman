@@ -33,6 +33,14 @@ class GameEngine:
         self.maze = None
         self.pacman = None
         self.ghost_manager = None
+        
+        # High score entry
+        self.player_name = ""
+        
+        # Visual effects
+        self.score_popup = None  # (text, x, y, timer)
+        self.death_timer = 0.0
+        
         self._initialize_game()
         
     def start(self) -> None:
@@ -82,6 +90,7 @@ class GameEngine:
             GameState.PLAYING: self.update_game,
             GameState.PAUSED: self.update_paused,
             GameState.GAME_OVER: self.update_game_over,
+            GameState.HIGH_SCORE_ENTRY: self.update_high_score_entry,
             GameState.QUIT_CONFIRM: self.update_quit_confirm
         }
         
@@ -109,7 +118,8 @@ class GameEngine:
             GameState.MENU: self._handle_menu_input,
             GameState.PLAYING: self._handle_game_input,
             GameState.PAUSED: self._handle_paused_input,
-            GameState.GAME_OVER: self._handle_game_over_input
+            GameState.GAME_OVER: self._handle_game_over_input,
+            GameState.HIGH_SCORE_ENTRY: self._handle_high_score_input
         }
         
         handler = input_handlers.get(self.state)
@@ -155,6 +165,19 @@ class GameEngine:
             self.reset_game()
             self.state = GameState.PLAYING
     
+    def _handle_high_score_input(self, key: str) -> None:
+        """Handle input for high score name entry."""
+        if key == '\n':  # Enter - submit name
+            if self.player_name:
+                self.scoring.add_high_score(self.player_name)
+            self.state = GameState.GAME_OVER
+        elif key == '\x7f' or key == '\x08':  # Backspace
+            if self.player_name:
+                self.player_name = self.player_name[:-1]
+        elif len(key) == 1 and (key.isalnum() or key == ' ') and len(self.player_name) < 20:
+            # Add character if alphanumeric and under 20 chars
+            self.player_name += key.upper()
+    
     def update_menu(self, delta_time: float) -> None:
         """Update menu state."""
         pass
@@ -163,6 +186,20 @@ class GameEngine:
         """Update game state."""
         if not self.pacman or not self.maze or not self.ghost_manager:
             return
+        
+        # Update score popup timer
+        if self.score_popup:
+            text, x, y, timer = self.score_popup
+            timer -= delta_time
+            if timer <= 0:
+                self.score_popup = None
+            else:
+                self.score_popup = (text, x, y, timer)
+        
+        # Handle death pause
+        if self.death_timer > 0:
+            self.death_timer -= delta_time
+            return  # Don't update anything else during death
             
         # Update Pac-Man
         self.pacman.update(delta_time, self.maze)
@@ -174,8 +211,10 @@ class GameEngine:
             
         # Check power pellet collection
         if self.maze.collect_power_pellet(px, py):
-            self.scoring.add_power_pellet()
+            points = self.scoring.add_power_pellet()
             self.ghost_manager.make_all_vulnerable()
+            # Show score popup
+            self.score_popup = (f"+{points}", px, py, 1.0)
             
         # Check level completion
         if self.maze.is_level_complete():
@@ -197,15 +236,21 @@ class GameEngine:
         colliding_ghost = self.ghost_manager.check_collision_with_pacman(self.pacman)
         if colliding_ghost:
             if colliding_ghost.is_vulnerable():
-                # Eat the ghost
-                points = self.ghost_manager.eat_ghost(colliding_ghost)
-                self.scoring.add_ghost()
+                # Eat the ghost - show score popup
+                points = self.scoring.add_ghost()
+                px, py = self.pacman.get_position()
+                self.score_popup = (f"+{points}", px, py, 1.0)
             elif colliding_ghost.is_dangerous():
-                # Pac-Man dies
+                # Pac-Man dies - pause for effect
+                self.death_timer = 1.5  # 1.5 second pause
                 game_over = self.game_state.lose_life()
                 if game_over:
-                    self.state = GameState.GAME_OVER
-                    self.scoring.update_high_score()
+                    # Check for high score
+                    if self.scoring.is_high_score():
+                        self.state = GameState.HIGH_SCORE_ENTRY
+                        self.player_name = ""
+                    else:
+                        self.state = GameState.GAME_OVER
                 else:
                     # Reset positions but keep score
                     self._reset_positions()
@@ -216,6 +261,10 @@ class GameEngine:
     
     def update_game_over(self, delta_time: float) -> None:
         """Update game over state."""
+        pass
+    
+    def update_high_score_entry(self, delta_time: float) -> None:
+        """Update high score entry state."""
         pass
     
     def update_quit_confirm(self, delta_time: float) -> None:
@@ -231,6 +280,7 @@ class GameEngine:
             GameState.PLAYING: self._render_playing,
             GameState.PAUSED: self._render_paused,
             GameState.GAME_OVER: self.render_game_over,
+            GameState.HIGH_SCORE_ENTRY: self.render_high_score_entry,
             GameState.QUIT_CONFIRM: self._render_quit_confirm
         }
         
@@ -295,6 +345,15 @@ class GameEngine:
         # Draw ghosts
         if self.ghost_manager:
             self._render_ghosts()
+        
+        # Draw score popup if active
+        if self.score_popup:
+            text, x, y, timer = self.score_popup
+            maze_start_y = 3
+            maze_start_x = (GAME_WIDTH - self.maze.width) // 2
+            screen_x = maze_start_x + x
+            screen_y = maze_start_y + y - 1  # Above the position
+            self.display.set_string(screen_x - len(text)//2, screen_y, text, Colors.YELLOW)
     
     def _render_maze(self) -> None:
         """Render the maze on the display."""
@@ -425,6 +484,35 @@ class GameEngine:
         self.display.draw_centered_text(center_y, f"High Score: {high_score:06d}", Colors.CYAN)
         self.display.draw_centered_text(center_y + 2, "Press SPACE to play again", Colors.WHITE)
         self.display.draw_centered_text(center_y + 3, "Press Q to quit", Colors.WHITE)
+    
+    def render_high_score_entry(self) -> None:
+        """Render high score entry screen."""
+        self.display.draw_border()
+        
+        center_y = GAME_HEIGHT // 2
+        score = self.scoring.get_score()
+        
+        self.display.draw_centered_text(center_y - 4, "NEW HIGH SCORE!", Colors.YELLOW)
+        self.display.draw_centered_text(center_y - 2, f"Score: {score:06d}", Colors.CYAN)
+        self.display.draw_centered_text(center_y, "Enter your name:", Colors.WHITE)
+        
+        # Draw input box
+        box_width = 24
+        box_x = (GAME_WIDTH - box_width) // 2
+        self.display.set_string(box_x, center_y + 2, "┌" + "─" * (box_width - 2) + "┐", Colors.WHITE)
+        self.display.set_string(box_x, center_y + 3, "│" + " " * (box_width - 2) + "│", Colors.WHITE)
+        self.display.set_string(box_x, center_y + 4, "└" + "─" * (box_width - 2) + "┘", Colors.WHITE)
+        
+        # Draw entered name
+        name_x = box_x + 2
+        self.display.set_string(name_x, center_y + 3, self.player_name, Colors.YELLOW)
+        
+        # Draw cursor
+        cursor_x = name_x + len(self.player_name)
+        if int(time.time() * 2) % 2:  # Blinking cursor
+            self.display.set_char(cursor_x, center_y + 3, "█", Colors.YELLOW)
+        
+        self.display.draw_centered_text(center_y + 6, "Press ENTER when done", Colors.WHITE)
     
     def _initialize_game(self) -> None:
         """Initialize the game objects for the current level."""
