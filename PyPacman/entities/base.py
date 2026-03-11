@@ -1,9 +1,13 @@
 """Base classes for game entities."""
 
-from typing import Tuple, Optional, Iterator
+from typing import Tuple, Iterator
 from dataclasses import dataclass
 from ..core.constants import Direction
 from ..core.maze import Maze
+
+
+# Type alias for direction - generic name for future flexibility
+DirectionType = Tuple[int, int]
 
 
 @dataclass
@@ -24,6 +28,10 @@ class Position:
             return self.x == other[0] and self.y == other[1]
         return False
     
+    def __hash__(self) -> int:
+        """Make Position hashable for use in sets and dicts."""
+        return hash((self.x, self.y))
+    
     def distance_to(self, other: 'Position') -> float:
         """Calculate Manhattan distance to another position."""
         return abs(self.x - other.x) + abs(self.y - other.y)
@@ -32,12 +40,16 @@ class Position:
         """Calculate Euclidean distance to another position."""
         import math
         return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
+    
+    def as_tuple(self) -> Tuple[int, int]:
+        """Return position as a tuple."""
+        return (self.x, self.y)
 
 
 class MovableEntity:
     """Base class for all moving entities in the game."""
     
-    def __init__(self, start_x: int, start_y: int, speed: float = 8.0):
+    def __init__(self, start_x: int, start_y: int, speed: float = 8.0) -> None:
         """
         Initialize a movable entity.
         
@@ -46,15 +58,15 @@ class MovableEntity:
             start_y: Starting Y position
             speed: Movement speed in cells per second
         """
-        self.start_position = Position(start_x, start_y)
-        self.position = Position(start_x, start_y)
+        self.start_position: Position = Position(start_x, start_y)
+        self.position: Position = Position(start_x, start_y)
         
         # Movement properties
-        self.direction = Direction.NONE
-        self.next_direction = Direction.NONE
-        self.speed = speed
-        self.move_timer = 0.0
-        self.moving = False
+        self.direction: DirectionType = Direction.NONE
+        self.next_direction: DirectionType = Direction.NONE
+        self.speed: float = speed
+        self.move_timer: float = 0.0
+        self.moving: bool = False
         
     def reset(self) -> None:
         """Reset entity to starting position."""
@@ -88,7 +100,7 @@ class MovableEntity:
         """
         return maze.is_walkable(x, y)
     
-    def move(self, maze: Maze, direction: Tuple[int, int]) -> bool:
+    def move(self, maze: Maze, direction: DirectionType) -> bool:
         """
         Attempt to move in the given direction.
         
@@ -103,8 +115,8 @@ class MovableEntity:
             return False
             
         dx, dy = direction
-        new_x = self.position.x + dx
-        new_y = self.position.y + dy
+        new_x: int = self.position.x + dx
+        new_y: int = self.position.y + dy
         
         # Handle maze wrapping (tunnels)
         if new_x < 0:
@@ -134,7 +146,7 @@ class MovableEntity:
             True if entity moved this frame
         """
         self.move_timer += delta_time
-        move_delay = 1.0 / self.speed
+        move_delay: float = 1.0 / self.speed
         
         if self.move_timer >= move_delay:
             self.move_timer = 0.0

@@ -1,7 +1,7 @@
 """Main game engine with improved organization."""
 
 import time
-from typing import Optional
+from typing import Optional, Tuple
 from .constants import GameState, FRAME_TIME, Colors, GAME_WIDTH, GAME_HEIGHT, Score, Sprites
 from .maze import Maze
 from .scoring import ScoringSystem
@@ -33,6 +33,9 @@ class GameEngine:
         self.maze = None
         self.pacman = None
         self.ghost_manager = None
+        
+        # Track previous positions for collision detection
+        self.previous_pacman_pos: Optional[Tuple[int, int]] = None
         
         # High score entry
         self.player_name = ""
@@ -225,7 +228,10 @@ class GameEngine:
         if self.death_timer > 0:
             self.death_timer -= delta_time
             return  # Don't update anything else during death
-            
+        
+        # Store Pac-Man's position before movement
+        self.previous_pacman_pos = self.pacman.get_position()
+        
         # Update Pac-Man
         self.pacman.update(delta_time, self.maze)
         
@@ -247,26 +253,37 @@ class GameEngine:
         if self.maze.is_level_complete():
             self.game_state.next_level()
             self._initialize_game()
+            return  # Don't process collisions after level change
             
-        # Update ghosts
+        # Update ghosts (this also stores their previous positions internally)
         self.ghost_manager.update(delta_time, self.maze, self.pacman)
         
         # Reset ghost combo if vulnerability expired
         if self.ghost_manager.vulnerability_expired:
             self.scoring.reset_ghost_combo()
         
-        # Check ghost collisions
+        # Check ghost collisions with improved detection
         self._check_ghost_collisions()
     
     def _check_ghost_collisions(self) -> None:
         """Check and handle ghost-Pac-Man collisions."""
-        colliding_ghost = self.ghost_manager.check_collision_with_pacman(self.pacman)
+        # Pass previous position for crossing detection
+        colliding_ghost = self.ghost_manager.check_collision_with_pacman(
+            self.pacman, 
+            self.previous_pacman_pos
+        )
+        
         if colliding_ghost:
             if colliding_ghost.is_vulnerable():
-                # Eat the ghost - show score popup
-                points = self.scoring.add_ghost()
+                # Ghost was already eaten by check_collision_with_pacman
+                # Calculate and show score popup
+                # Note: ghosts_eaten_in_sequence was already incremented in eat_ghost
+                eaten_count = self.ghost_manager.ghosts_eaten_in_sequence
+                points = 200 * (2 ** (eaten_count - 1))
+                points = min(points, 1600)
                 px, py = self.pacman.get_position()
                 self.score_popup = (f"+{points}", px, py, 1.0)
+                self.scoring.add_ghost()
             elif colliding_ghost.is_dangerous():
                 # Pac-Man dies - pause for effect
                 self.death_timer = 1.5  # 1.5 second pause
@@ -421,26 +438,46 @@ class GameEngine:
         # Draw score popup if active
         if self.score_popup:
             text, x, y, timer = self.score_popup
-            maze_start_y = 3
-            maze_start_x = (GAME_WIDTH - self.maze.width) // 2
+            maze_start_y = self._get_maze_start_y()
+            maze_start_x = self._get_maze_start_x()
             screen_x = maze_start_x + x
             screen_y = maze_start_y + y - 1  # Above the position
-            self.display.set_string(screen_x - len(text)//2, screen_y, text, Colors.YELLOW)
+            if 0 <= screen_y < GAME_HEIGHT:
+                self.display.set_string(max(1, screen_x - len(text)//2), screen_y, text, Colors.YELLOW)
+    
+    def _get_maze_start_x(self) -> int:
+        """Get the X position where the maze starts (centered)."""
+        if self.maze:
+            return (GAME_WIDTH - self.maze.width) // 2
+        return 1
+    
+    def _get_maze_start_y(self) -> int:
+        """Get the Y position where the maze starts."""
+        return 3  # Below the HUD
+    
+    def _get_max_maze_height(self) -> int:
+        """Get the maximum height available for the maze."""
+        # GAME_HEIGHT - top_border(1) - HUD(2) - bottom_border(1) = GAME_HEIGHT - 4
+        return GAME_HEIGHT - 4
     
     def _render_maze(self) -> None:
         """Render the maze on the display."""
-        # Calculate centered position
-        maze_start_y = 3
-        maze_start_x = (GAME_WIDTH - self.maze.width) // 2
+        maze_start_y = self._get_maze_start_y()
+        maze_start_x = self._get_maze_start_x()
         
-        # Ensure maze fits in the display
-        max_render_height = min(self.maze.height, GAME_HEIGHT - maze_start_y - 1)
+        # Calculate how much of the maze we can actually render
+        max_render_height = min(self.maze.height, self._get_max_maze_height())
         
         for y in range(max_render_height):
             for x in range(self.maze.width):
-                char = self.maze.get_cell_char(x, y)
-                color = self._get_maze_cell_color(char)
-                self.display.set_char(maze_start_x + x, maze_start_y + y, char, color)
+                screen_x = maze_start_x + x
+                screen_y = maze_start_y + y
+                
+                # Make sure we don't write outside the buffer
+                if 1 <= screen_x < GAME_WIDTH - 1 and 1 <= screen_y < GAME_HEIGHT - 1:
+                    char = self.maze.get_cell_char(x, y)
+                    color = self._get_maze_cell_color(char)
+                    self.display.set_char(screen_x, screen_y, char, color)
     
     def _get_maze_cell_color(self, char: str) -> str:
         """Get the appropriate color for a maze cell character."""
@@ -448,7 +485,7 @@ class GameEngine:
             Sprites.WALL: Colors.BLUE,
             Sprites.DOT: Colors.WHITE,
             Sprites.POWER_PELLET: Colors.YELLOW,
-            Sprites.GHOST_HOUSE_FLOOR: Colors.PINK
+            Sprites.GHOST_DOOR: Colors.PINK,
         }
         return color_map.get(char, Colors.WHITE)
     
@@ -457,37 +494,37 @@ class GameEngine:
         if not self.pacman or not self.maze:
             return
             
-        # Calculate position on screen
-        maze_start_y = 3
-        maze_start_x = (GAME_WIDTH - self.maze.width) // 2
+        maze_start_y = self._get_maze_start_y()
+        maze_start_x = self._get_maze_start_x()
         
         px, py = self.pacman.get_position()
         screen_x = maze_start_x + px
         screen_y = maze_start_y + py
         
-        # Draw Pac-Man sprite
-        sprite = self.pacman.get_sprite()
-        self.display.set_char(screen_x, screen_y, sprite, Colors.YELLOW)
+        # Only render if within visible area
+        if 1 <= screen_x < GAME_WIDTH - 1 and 1 <= screen_y < GAME_HEIGHT - 1:
+            sprite = self.pacman.get_sprite()
+            self.display.set_char(screen_x, screen_y, sprite, Colors.YELLOW)
     
     def _render_ghosts(self) -> None:
         """Render all ghosts on the display."""
         if not self.ghost_manager or not self.maze:
             return
             
-        # Calculate maze position on screen
-        maze_start_y = 3
-        maze_start_x = (GAME_WIDTH - self.maze.width) // 2
+        maze_start_y = self._get_maze_start_y()
+        maze_start_x = self._get_maze_start_x()
         
         # Get all ghost positions and render them
         for x, y, sprite, color in self.ghost_manager.get_ghost_positions():
             screen_x = maze_start_x + x
             screen_y = maze_start_y + y
-            self.display.set_char(screen_x, screen_y, sprite, color)
+            
+            # Only render if within visible area
+            if 1 <= screen_x < GAME_WIDTH - 1 and 1 <= screen_y < GAME_HEIGHT - 1:
+                self.display.set_char(screen_x, screen_y, sprite, color)
     
     def render_pause_overlay(self) -> None:
         """Render pause overlay with centered dialog box."""
-        from ..core.constants import BorderChars
-        
         self._render_dialog_box(
             "PAUSED",
             "Press SPACE to continue",
@@ -601,46 +638,46 @@ class GameEngine:
         layout = get_level(self.game_state.get_level())
         self.maze = Maze(layout)
         
-        # Find a good starting position for Pac-Man
-        start_pos = self._find_pacman_start_position()
-        self.pacman = PacMan(start_pos.x, start_pos.y)
+        # Find Pac-Man starting position from maze or calculate one
+        spawn_pos = self.maze.get_pacman_spawn()
+        
+        # Verify spawn is walkable, otherwise find a suitable position
+        if not self.maze.is_walkable_for_pacman(spawn_pos[0], spawn_pos[1]):
+            spawn_pos = self._find_pacman_start_position()
+        
+        self.pacman = PacMan(spawn_pos[0], spawn_pos[1])
+        self.previous_pacman_pos = spawn_pos
         
         # Initialize ghost manager
         self.ghost_manager = GhostManager(self.maze)
     
-    def _find_pacman_start_position(self) -> Position:
+    def _find_pacman_start_position(self) -> tuple:
         """Find a suitable starting position for Pac-Man."""
-        from ..entities.base import Position
-        
-        # Start from bottom center and look for a dot
+        # Start from bottom center and look for a walkable position
         start_x = self.maze.width // 2
         start_y = self.maze.height - 2
         
-        # Search for a position with a dot
+        # Search for a position with a dot, starting from bottom
         search_radius = 5
         for y in range(start_y, max(self.maze.height // 2, 0), -1):
             for x in range(max(0, start_x - search_radius), 
                           min(self.maze.width, start_x + search_radius + 1)):
-                if self.maze.is_walkable(x, y) and self.maze.has_dot(x, y):
-                    return Position(x, y)
+                if self.maze.is_walkable_for_pacman(x, y):
+                    return (x, y)
         
         # Fallback: find any walkable position
-        for y in range(start_y, 0, -1):
-            if self.maze.is_walkable(start_x, y):
-                return Position(start_x, y)
-        
-        # Last resort: any walkable position
-        for y in range(self.maze.height):
+        for y in range(self.maze.height - 1, 0, -1):
             for x in range(self.maze.width):
-                if self.maze.is_walkable(x, y):
-                    return Position(x, y)
+                if self.maze.is_walkable_for_pacman(x, y):
+                    return (x, y)
         
-        return Position(1, 1)  # Default fallback
+        return (1, 1)  # Last resort fallback
     
     def _reset_positions(self) -> None:
         """Reset Pac-Man and ghost positions after death."""
         if self.pacman:
             self.pacman.reset()
+            self.previous_pacman_pos = self.pacman.get_position()
         if self.ghost_manager:
             self.ghost_manager.reset()
     

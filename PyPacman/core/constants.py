@@ -2,11 +2,15 @@
 Game constants and configuration settings.
 """
 
-# Game dimensions
+# Game dimensions - sized for the maze plus HUD
 GAME_WIDTH = 80
 GAME_HEIGHT = 24
 MIN_TERMINAL_WIDTH = 80
 MIN_TERMINAL_HEIGHT = 24
+
+# Playable area (inside border)
+PLAYABLE_WIDTH = GAME_WIDTH - 2
+PLAYABLE_HEIGHT = GAME_HEIGHT - 2
 
 # Frame rate and timing
 TARGET_FPS = 10
@@ -51,21 +55,23 @@ class Direction:
 # ASCII characters for game elements
 class Sprites:
     WALL = "█"  # Block character for walls
-    DOT = "."
-    POWER_PELLET = "O"
+    DOT = "·"   # Middle dot for regular pellets (more subtle)
+    POWER_PELLET = "●"  # Large bullet for power pellets (more visible)
     EMPTY = " "
-    GHOST_HOUSE_FLOOR = "═"  # Ghost house floor indicator
+    GHOST_HOUSE_FLOOR = " "  # Ghost house interior (empty)
+    GHOST_DOOR = "─"  # Ghost house door (horizontal line)
     
     # Pac-Man sprites (direction-based)
     PACMAN_RIGHT = ">"
     PACMAN_LEFT = "<"
     PACMAN_UP = "^"
     PACMAN_DOWN = "v"
-    PACMAN_CLOSED = "C"
+    PACMAN_CLOSED = "O"
     
     # Ghost sprites
-    GHOST = "&"
-    VULNERABLE_GHOST = "%"
+    GHOST = "⌂"  # Ghost character (house shape looks like ghost)
+    VULNERABLE_GHOST = "▒"  # Vulnerable ghost (shaded)
+    EATEN_GHOST = "×"  # Eyes returning to house
 
 # UI Border characters
 class BorderChars:
@@ -88,6 +94,7 @@ class Colors:
     ORANGE = "\033[38;5;208m"  # Clyde
     BLUE = "\033[94m"    # Walls and vulnerable ghosts
     WHITE = "\033[97m"   # Dots and text
+    GREEN = "\033[92m"   # Fruit/bonus items
 
 # Scoring
 class Score:
