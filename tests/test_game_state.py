@@ -1,7 +1,7 @@
 """Tests for game state management."""
 
 import unittest
-from ascii_pacman.core.game_state import GameState
+from PyPacman.core.game_state import GameState
 
 
 class TestGameState(unittest.TestCase):

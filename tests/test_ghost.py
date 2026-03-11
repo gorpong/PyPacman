@@ -9,11 +9,11 @@ import os
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ascii_pacman.entities.ghost import Ghost, Blinky, Pinky, Inky, Clyde, GhostMode, GhostState
-from ascii_pacman.entities.ghost_manager import GhostManager
-from ascii_pacman.core.maze import Maze
-from ascii_pacman.entities.pacman import PacMan
-from ascii_pacman.core.constants import Colors
+from PyPacman.entities.ghost import Ghost, Blinky, Pinky, Inky, Clyde, GhostMode, GhostState
+from PyPacman.entities.ghost_manager import GhostManager
+from PyPacman.core.maze import Maze
+from PyPacman.entities.pacman import PacMan
+from PyPacman.core.constants import Colors
 
 
 class TestGhost(unittest.TestCase):

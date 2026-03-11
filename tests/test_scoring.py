@@ -4,7 +4,7 @@ import unittest
 import os
 import tempfile
 from pathlib import Path
-from ascii_pacman.core.scoring import ScoringSystem
+from PyPacman.core.scoring import ScoringSystem
 
 
 class TestScoringSystem(unittest.TestCase):

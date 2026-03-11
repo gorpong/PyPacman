@@ -3,8 +3,8 @@ Tests for input handling functionality.
 """
 
 import unittest
-from ascii_pacman.ui.input_handler import MockInputHandler
-from ascii_pacman.core.constants import Keys, Direction
+from PyPacman.ui.input_handler import MockInputHandler
+from PyPacman.core.constants import Keys, Direction
 
 
 class TestInputHandler(unittest.TestCase):

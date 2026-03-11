@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="ascii-pacman",
+    name="pypacman",
     version="1.0.0",
     author="ASCII Game Studio",
     description="A terminal-based ASCII version of the classic Pac-Man arcade game",
@@ -15,7 +15,7 @@ setup(
     url="https://github.com/yourusername/ascii-pacman",
     packages=find_packages(),
     package_data={
-        'ascii_pacman': ['data/*.py'],
+        'pypacman': ['data/*.py'],
     },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -37,8 +37,8 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "ascii-pacman=ascii_pacman.main:main",
-            "pacman=ascii_pacman.main:main",
+            "pypacman=PyPacman.main:main",
+            "pacman=PyPacman.main:main",
         ],
     },
 )

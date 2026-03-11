@@ -3,10 +3,10 @@ Tests for game engine functionality.
 """
 
 import unittest
-from ascii_pacman.core.game_engine import GameEngine
-from ascii_pacman.ui.display import MockDisplay
-from ascii_pacman.ui.input_handler import MockInputHandler
-from ascii_pacman.core.constants import GameState, Keys
+from PyPacman.core.game_engine import GameEngine
+from PyPacman.ui.display import MockDisplay
+from PyPacman.ui.input_handler import MockInputHandler
+from PyPacman.core.constants import GameState, Keys
 
 
 class TestGameEngine(unittest.TestCase):

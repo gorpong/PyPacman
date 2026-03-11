@@ -9,9 +9,9 @@ import os
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ascii_pacman.entities.pacman import PacMan
-from ascii_pacman.core.maze import Maze
-from ascii_pacman.core.constants import Direction, Sprites
+from PyPacman.entities.pacman import PacMan
+from PyPacman.core.maze import Maze
+from PyPacman.core.constants import Direction, Sprites
 
 
 class TestPacMan(unittest.TestCase):

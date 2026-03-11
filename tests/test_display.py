@@ -3,8 +3,8 @@ Tests for display and rendering functionality.
 """
 
 import unittest
-from ascii_pacman.ui.display import MockDisplay
-from ascii_pacman.core.constants import GAME_WIDTH, GAME_HEIGHT, Colors
+from PyPacman.ui.display import MockDisplay
+from PyPacman.core.constants import GAME_WIDTH, GAME_HEIGHT, Colors
 
 
 class TestDisplay(unittest.TestCase):

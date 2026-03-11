@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ascii-pacman"
+name = "PyPacman"
 version = "1.0.0"
 description = "A terminal-based ASCII version of the classic Pac-Man arcade game"
 readme = "README.md"
@@ -30,8 +30,8 @@ classifiers = [
 dependencies = []
 
 [project.scripts]
-ascii-pacman = "ascii_pacman:main"
-pacman = "ascii_pacman:main"
+PyPacman = "PyPacman:main"
+pacman = "PyPacman:main"
 
 [project.urls]
 Homepage = "https://github.com/yourusername/ascii-pacman"
@@ -39,8 +39,8 @@ Repository = "https://github.com/yourusername/ascii-pacman.git"
 "Bug Tracker" = "https://github.com/yourusername/ascii-pacman/issues"
 
 [tool.setuptools.packages.find]
-include = ["ascii_pacman*"]
+include = ["PyPacman*"]
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
-ascii_pacman = ["data/*.py"]
+PyPacman = ["data/*.py"]

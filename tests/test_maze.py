@@ -3,7 +3,7 @@ Tests for maze functionality.
 """
 
 import unittest
-from ascii_pacman.core.maze import Maze, Cell
+from PyPacman.core.maze import Maze, Cell
 
 
 class TestMaze(unittest.TestCase):
