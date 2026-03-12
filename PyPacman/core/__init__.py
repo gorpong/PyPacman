@@ -1,58 +1,23 @@
 """
 Core game modules.
 
-This package provides the foundational types, configuration, and
-game logic components.
+This package exposes a convenient public API while keeping imports lazy to
+avoid widening the runtime import graph during package initialization.
 """
 from __future__ import annotations
 
-from .colors import Colors
-from .config import (
-    FRAME_TIME,
-    GAME_HEIGHT,
-    GAME_WIDTH,
-    GHOST_VULNERABLE_DURATION,
-    INITIAL_LIVES,
-    MIN_TERMINAL_HEIGHT,
-    MIN_TERMINAL_WIDTH,
-    PLAYABLE_HEIGHT,
-    PLAYABLE_WIDTH,
-    POWER_PELLET_DURATION,
-    SCORE_DOT,
-    SCORE_EXTRA_LIFE,
-    SCORE_GHOST_BASE,
-    SCORE_GHOST_MULTIPLIER,
-    SCORE_POWER_PELLET,
-    TARGET_FPS,
-)
-from .game_engine import GameEngine
-from .game_state import GameState
-from .maze import Maze
-from .scoring import ScoringSystem
-from .sprites import BorderChars, Sprites
-from .types import (
-    CellType,
-    Direction,
-    DirectionType,
-    GameMode,
-    GhostProtocol,
-    MazeProtocol,
-    PacManProtocol,
-    Position,
-)
+from importlib import import_module
+from typing import Any
 
 __all__ = [
-    # Types
     "Position",
     "Direction",
     "DirectionType",
     "GameMode",
     "CellType",
-    # Protocols
     "MazeProtocol",
     "PacManProtocol",
     "GhostProtocol",
-    # Config
     "GAME_WIDTH",
     "GAME_HEIGHT",
     "MIN_TERMINAL_WIDTH",
@@ -69,13 +34,63 @@ __all__ = [
     "SCORE_GHOST_BASE",
     "SCORE_GHOST_MULTIPLIER",
     "SCORE_EXTRA_LIFE",
-    # Visual
     "Sprites",
     "BorderChars",
     "Colors",
-    # Classes
     "GameEngine",
     "Maze",
     "GameState",
     "ScoringSystem",
 ]
+
+_EXPORTS: dict[str, tuple[str, str]] = {
+    "Position": (".types", "Position"),
+    "Direction": (".types", "Direction"),
+    "DirectionType": (".types", "DirectionType"),
+    "GameMode": (".types", "GameMode"),
+    "CellType": (".types", "CellType"),
+    "MazeProtocol": (".types", "MazeProtocol"),
+    "PacManProtocol": (".types", "PacManProtocol"),
+    "GhostProtocol": (".types", "GhostProtocol"),
+    "GAME_WIDTH": (".config", "GAME_WIDTH"),
+    "GAME_HEIGHT": (".config", "GAME_HEIGHT"),
+    "MIN_TERMINAL_WIDTH": (".config", "MIN_TERMINAL_WIDTH"),
+    "MIN_TERMINAL_HEIGHT": (".config", "MIN_TERMINAL_HEIGHT"),
+    "PLAYABLE_WIDTH": (".config", "PLAYABLE_WIDTH"),
+    "PLAYABLE_HEIGHT": (".config", "PLAYABLE_HEIGHT"),
+    "TARGET_FPS": (".config", "TARGET_FPS"),
+    "FRAME_TIME": (".config", "FRAME_TIME"),
+    "INITIAL_LIVES": (".config", "INITIAL_LIVES"),
+    "POWER_PELLET_DURATION": (".config", "POWER_PELLET_DURATION"),
+    "GHOST_VULNERABLE_DURATION": (".config", "GHOST_VULNERABLE_DURATION"),
+    "SCORE_DOT": (".config", "SCORE_DOT"),
+    "SCORE_POWER_PELLET": (".config", "SCORE_POWER_PELLET"),
+    "SCORE_GHOST_BASE": (".config", "SCORE_GHOST_BASE"),
+    "SCORE_GHOST_MULTIPLIER": (".config", "SCORE_GHOST_MULTIPLIER"),
+    "SCORE_EXTRA_LIFE": (".config", "SCORE_EXTRA_LIFE"),
+    "Sprites": (".sprites", "Sprites"),
+    "BorderChars": (".sprites", "BorderChars"),
+    "Colors": (".colors", "Colors"),
+    "GameEngine": (".game_engine", "GameEngine"),
+    "Maze": (".maze", "Maze"),
+    "GameState": (".game_state", "GameState"),
+    "ScoringSystem": (".scoring", "ScoringSystem"),
+}
+
+
+def __getattr__(name: str) -> Any:
+    """Resolve public exports lazily to avoid eager import chains."""
+    try:
+        module_name, attr_name = _EXPORTS[name]
+    except KeyError as exc:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}") from exc
+
+    module = import_module(module_name, __name__)
+    value = getattr(module, attr_name)
+    globals()[name] = value
+    return value
+
+
+def __dir__() -> list[str]:
+    """Expose lazy exports to introspection tools."""
+    return sorted(list(globals().keys()) + __all__)

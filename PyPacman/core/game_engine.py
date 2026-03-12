@@ -5,8 +5,10 @@ import time
 from typing import Callable
 
 from ..data.levels import get_level
-from ..entities import GhostManager, PacMan
-from ..ui import Display, InputHandler
+from ..entities.ghost_manager import GhostManager
+from ..entities.pacman import PacMan
+from ..ui.display import Display
+from ..ui.input_handler import InputHandler
 from .colors import Colors
 from .config import FRAME_TIME, GAME_HEIGHT, GAME_WIDTH
 from .game_state import GameState

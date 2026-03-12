@@ -117,7 +117,7 @@ class TestGameEngine(unittest.TestCase):
         """Test movement input is processed in game state."""
         self.game.state = GameMode.PLAYING
 
-        movement_keys = ['up', 'down', 'left', 'right',
+        movement_keys = [Keys.UP, Keys.DOWN, Keys.LEFT, Keys.RIGHT,
                          Keys.W, Keys.A, Keys.S, Keys.D]
 
         for key in movement_keys:

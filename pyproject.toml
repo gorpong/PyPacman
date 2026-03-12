@@ -40,9 +40,9 @@ pypacman = "PyPacman.main:main"
 pacman = "PyPacman.main:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/PyPacman"
-Repository = "https://github.com/yourusername/PyPacman.git"
-"Bug Tracker" = "https://github.com/yourusername/PyPacman/issues"
+Homepage = "https://github.com/gorpong/PyPacman"
+Repository = "https://github.com/gorpong/PyPacman.git"
+"Bug Tracker" = "https://github.com/gorpong/PyPacman/issues"
 
 [tool.setuptools.packages.find]
 include = ["PyPacman*"]

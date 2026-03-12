@@ -5,7 +5,7 @@ If any instructions conflicts with a user request, ask before proceeding.
 
 ## Project summary
 
-- This is a terminal-based ASCII version of the classic Pac-Man arcade game, implemented in Python 3.12.4+
+- This is a terminal-based ASCII version of the classic Pac-Man arcade game, implemented in Python 3.11+
 - Primary goal: Playable and fun, but not a full commercial product
 - Non-Goals: no in-game purchases
 
@@ -16,7 +16,7 @@ If any instructions conflicts with a user request, ask before proceeding.
   - Arrow keys (↑↓←→) for standard users
   - WASD keys for left-handed users
   - ESC to quit, SPACE to pause
-- **Python Version**: 3.12.4 or better
+- **Python Version**: 3.11 or better
 - **Dependencies**: Minimal - using only Python standard library
 
 ## Technical Architecture
@@ -27,6 +27,16 @@ If any instructions conflicts with a user request, ask before proceeding.
 - **State Machine**: Clean separation of game states
 - **Component System**: Modular design for easy testing and maintenance
 - **Observer Pattern**: For score updates and game events
+- **Protocol-Based Boundaries**: Shared contracts in `core/types.py` reduce
+  concrete cross-module imports
+
+### Module Layout
+
+- `core/types.py`: shared types, enums, and protocols
+- `core/config.py`: gameplay tuning and display constants
+- `core/colors.py` and `core/sprites.py`: rendering constants
+- Internal runtime code should prefer leaf-module imports over package-barrel
+  imports to reduce circular import risk
 
 ### Testing Strategy
 
@@ -90,13 +100,13 @@ All development phases complete. The game is feature-complete, tested, and ready
 - ✅ Visual effects (score popups, animations)
 - ✅ Scrolling high scores on splash screen
 - ✅ Dual control schemes (arrows + WASD)
-- ✅ 84 comprehensive tests, all passing
+- ✅ 112 comprehensive tests, all passing
 - ✅ PyPI-ready package structure
 
-**Current Branch**: `master`
+**Current Branch**: Varies by worktree
 **Version**: 1.0
 **Status**: Released and ready for distribution
-**Tests**: 84/84 passing ✅
+**Tests**: 112/112 passing ✅
 
 ## Documentation Maintenance 📚
 

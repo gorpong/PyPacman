@@ -16,10 +16,10 @@ class TestInputHandler(unittest.TestCase):
 
     def test_arrow_key_to_direction(self) -> None:
         """Test arrow key to direction mapping."""
-        self.assertEqual(self.input_handler.key_to_direction('up'), Direction.UP)
-        self.assertEqual(self.input_handler.key_to_direction('down'), Direction.DOWN)
-        self.assertEqual(self.input_handler.key_to_direction('left'), Direction.LEFT)
-        self.assertEqual(self.input_handler.key_to_direction('right'), Direction.RIGHT)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.UP), Direction.UP)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.DOWN), Direction.DOWN)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.LEFT), Direction.LEFT)
+        self.assertEqual(self.input_handler.key_to_direction(Keys.RIGHT), Direction.RIGHT)
 
     def test_wasd_key_to_direction(self) -> None:
         """Test WASD key to direction mapping."""
@@ -49,23 +49,23 @@ class TestInputHandler(unittest.TestCase):
         """Test mock input handler queue functionality."""
         self.assertIsNone(self.input_handler.get_key())
 
-        self.input_handler.add_key('up')
+        self.input_handler.add_key(Keys.UP)
         self.input_handler.add_key(Keys.SPACE)
 
-        self.assertEqual(self.input_handler.get_key(), 'up')
+        self.assertEqual(self.input_handler.get_key(), Keys.UP)
         self.assertEqual(self.input_handler.get_key(), Keys.SPACE)
         self.assertIsNone(self.input_handler.get_key())
 
     def test_arrow_keys_work_correctly(self) -> None:
         """Test that arrow keys work correctly."""
         # Arrow keys should return direction keys
-        self.input_handler.add_key('up')
+        self.input_handler.add_key(Keys.UP)
         result = self.input_handler.get_key()
-        self.assertEqual(result, 'up')
+        self.assertEqual(result, Keys.UP)
 
-        self.input_handler.add_key('down')
+        self.input_handler.add_key(Keys.DOWN)
         result = self.input_handler.get_key()
-        self.assertEqual(result, 'down')
+        self.assertEqual(result, Keys.DOWN)
 
 
 if __name__ == '__main__':

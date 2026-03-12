@@ -1,90 +1,52 @@
 # Changelog
 
-All notable changes to ASCII Pac-Man will be documented in this file.
+All notable changes to ASCII Pac-Man are documented in this file.
 
-## [1.0.0] - 2024
+## [Unreleased]
 
-### 🎉 Initial Release
+### Changed
 
-Complete implementation of classic Pac-Man gameplay in ASCII terminal format.
+- Refactored the old monolithic core constants module into focused modules:
+  `core/config.py`, `core/colors.py`, `core/sprites.py`, and `core/types.py`
+- Introduced protocol-based boundaries with `MazeProtocol`,
+  `PacManProtocol`, and `GhostProtocol` to reduce concrete cross-module
+  dependencies
+- Centralized shared structural types such as `Position`, `Direction`,
+  `GameMode`, and `CellType` in `core/types.py`
+- Standardized much of the spatial API on `Position` objects instead of raw
+  `(x, y)` tuples
+- Replaced internal package-barrel imports with leaf-module imports in runtime
+  code to further reduce circular import risk
+- Consolidated packaging and tool configuration into `pyproject.toml`
+- Raised the supported Python runtime to `3.11+`
+- Expanded and updated the automated test suite to `112` tests
+- Restored explicit directional key constants such as `Keys.UP` and
+  `Keys.ESCAPE` for the input API
+
+### Removed
+
+- Removed `PyPacman/core/constants.py`
+- Removed legacy packaging files `setup.py` and `requirements.txt`
+
+### Notes
+
+- The protocol/type refactor is intended as an architectural cleanup; gameplay
+  behavior remains the same
+
+## [1.0.0] - 2025-10-30
 
 ### Added
 
-#### Core Gameplay
-- Classic Pac-Man maze navigation and gameplay
-- 470 dots and 4 power pellets to collect
-- Level completion and progression
-- Game states: Menu, Playing, Paused, Game Over
-
-#### Characters
-- Pac-Man character with directional sprites and mouth animation
-- Four ghosts with unique AI personalities:
-  - **Blinky (Red)**: Direct aggressive chaser
-  - **Pinky (Pink)**: Ambusher targeting ahead of Pac-Man
-  - **Inky (Cyan)**: Complex patrol/ambush hybrid
-  - **Clyde (Orange)**: Distance-based behavior switcher
-- Ghost house with timed release mechanics
-- Scatter/Chase mode alternation
-- Vulnerability system after power pellets
-
-#### Scoring & Progression
-- Dot collection: 10 points each
-- Power pellets: 50 points each
-- Progressive ghost scoring: 200, 400, 800, 1600 points
-- High score persistence to ~/.ascii_pacman_scores.json
-- Top 10 leaderboard with player names
-- Lives system (3 lives)
-- Level progression with difficulty scaling
-
-#### Visual & UI
-- 74x20 character maze display
-- Auto-centering for terminals larger than 80x24
-- Score, high score, lives, and level HUD
-- Visual score popups for pellets and ghosts
-- Death animation with pause effect
-- High score entry screen with blinking cursor
-- Scrolling high scores on splash screen (after 10s idle)
-- Game over screen with leaderboard
-
-#### Controls
-- Arrow keys for movement
-- WASD alternative controls
-- SPACE to pause/start
-- Q or ESC to quit
-- Quit confirmation dialog
-
-#### Technical
-- Pure Python implementation (stdlib only)
-- Clean package structure (core/, entities/, ui/, data/)
-- Console entry points: `ascii-pacman` and `pacman`
-- Comprehensive test suite (84 tests)
-- Cross-platform support (Linux, macOS, Windows)
-- Position-based entity system
-- MovableEntity base class for code reuse
-
-### Development Timeline
-- Phase 1: Foundation and Game Engine
-- Phase 2: Maze and World
-- Phase 3: Pac-Man Character
-- Phase 4: Ghost AI
-- Refactoring: Package Structure
-- Phase 5: Game Logic and Polish
-- Phase 6: Final Integration and Testing
-
-### Testing
-- 84 comprehensive unit tests
-- Coverage of all major systems
-- Integration testing via unit test suite
-- All tests passing
-
----
-
-## Future Considerations
-
-Potential enhancements for future versions:
-- Additional maze layouts
-- Bonus fruit items
-- Enhanced sound effects (visual cues)
-- Level completion animations
-- More ghost AI variations
-- Configurable difficulty settings
+- Complete classic Pac-Man gameplay loop in an ASCII terminal interface
+- Four ghosts with distinct personalities:
+  Blinky, Pinky, Inky, and Clyde
+- Dot and power pellet collection
+- Progressive ghost scoring: `200 / 400 / 800 / 1600`
+- Lives system, respawning, and level progression
+- High score persistence with top-10 leaderboard and player names
+- Score popups, death pause effect, and scrolling high scores on the menu
+- Arrow-key and `W/A/S/D` controls
+- Pause, quit confirmation, and game-over flows
+- Pure-stdlib runtime with package structure split across `core`, `entities`,
+  `ui`, and `data`
+- Initial automated test suite with `84` tests

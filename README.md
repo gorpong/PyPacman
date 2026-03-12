@@ -1,153 +1,159 @@
-# ASCII Pac-Man v1.0
+# ASCII Pac-Man
 
-A complete terminal-based ASCII version of Pac-Man, bringing the arcade experience to your command line!
+A terminal-based ASCII version of the classic Pac-Man arcade game, implemented in pure Python.
 
-## **🎉 Version 1.0 - Full Release! 🎉**
+Official repository: `https://github.com/gorpong/PyPacman`
+
+## Current State
+
+- Version: `1.0.0`
+- Runtime requirement: Python `3.11+`
+- Runtime dependencies: Python standard library only
+- Packaging and tool configuration: `pyproject.toml`
+- Test suite: `112` tests passing
 
 ## Features
 
-### Gameplay
-
-- 🎮 **Classic Pac-Man Gameplay**: Navigate mazes, collect dots, avoid ghosts
-- 👻 **Four Unique Ghosts**: Each with distinct AI personalities (Blinky, Pinky, Inky, Clyde)
-- 🎯 **Power Pellets**: Turn vulnerable ghosts blue and eat them for bonus points
-- 💀 **Progressive Ghost Scoring**: 200, 400, 800, 1600 points per combo
-- ❤️ **Lives System**: Start with 3 lives, respawn after death
-- 📈 **Level Progression**: Increasing difficulty with faster ghosts
-- 🏆 **High Score System**: Top 10 scores saved with player names
-
-### Visual & Audio
-
-- 🎨 **ASCII Graphics**: Beautiful terminal-based visuals using Unicode characters
-- ✨ **Visual Effects**: Score popups, death animations, power pellet effects
-- 📺 **Scrolling High Scores**: Arcade-style attract mode on splash screen
-- 🖥️ **Terminal Optimized**: Works great in 80x24 terminals, auto-centers on larger displays
-
-### Controls & Interface
-
-- 🎮 **Dual Control Schemes**: 
-  - Arrow keys (↑↓←→) for traditional users
-  - WASD for left-handed players
-- ⏸️ **Pause/Resume**: SPACE to pause, ESC or Q to quit
-- 📊 **Live HUD**: Score, high score, lives, and level display
-
-### Technical
-
-- 🐍 **Pure Python**: No external dependencies, uses only Python standard library
-- 🌍 **Cross-Platform**: Runs on Linux, macOS, and Windows
-- 📦 **Easy Installation**: pip installable, console entry points
-- ✅ **Well Tested**: 84 comprehensive unit tests
-
-## Requirements
-
-- Python 3.8+ (tested on 3.8, 3.9, 3.10, 3.11, 3.12)
-- Terminal with 80x24 character display minimum
-- Terminal with ANSI color support (most modern terminals)
+- Classic Pac-Man gameplay with dots, power pellets, lives, and level progression
+- Four ghosts with distinct chase behaviors: Blinky, Pinky, Inky, and Clyde
+- Progressive ghost scoring: `200 / 400 / 800 / 1600`
+- High score persistence with top-10 name entry
+- Scrolling high scores on the menu screen
+- Unicode terminal rendering with HUD, borders, and score popups
+- Dual control scheme: arrow keys or `W/A/S/D`
+- Optimized for `80x24` terminals with centering on larger terminals
 
 ## Installation
 
-### From Source (Development)
+Install from the repository root:
 
 ```bash
-git clone https://github.com/yourusername/PyPacman
-cd PyPacman
-pip install -e .
+python -m pip install .
 ```
 
-### Quick Start (No Installation)
+Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/PyPacman
+git clone https://github.com/gorpong/PyPacman.git
 cd PyPacman
-python -m PyPacman
 ```
 
-## Usage
+For development:
 
-After installation, you can run the game using either command:
+```bash
+python -m pip install -e ".[dev]"
+```
+
+## Running The Game
+
+After installation, either console script works:
 
 ```bash
 pacman
-# or
-PyPacman
+```
+
+```bash
+pypacman
+```
+
+You can also run the module directly from the repository:
+
+```bash
+python -m PyPacman.main
 ```
 
 ## Controls
 
-### Standard Controls
+- Arrow keys: move Pac-Man
+- `W/A/S/D`: alternate movement controls
+- `Space`: pause or resume
+- `Q` or `Esc`: quit with confirmation
 
-- **↑/↓/←/→**: Move Pac-Man
-- **Space**: Pause/Resume game
-- **Q**: Quit game (with confirmation)
+## Scoring
 
-### Left-Handed Alternative
-
-- **W/A/S/D**: Move Pac-Man (Up/Left/Down/Right)
-- **Space**: Pause/Resume game
-- **Q**: Quit game (with confirmation)
-
-## Game Mechanics
-
-### Scoring
-
-- Dot: 10 points
-- Power Pellet: 50 points
-- Ghost (1st): 200 points
-- Ghost (2nd): 400 points
-- Ghost (3rd): 800 points
-- Ghost (4th): 1600 points
-
-### Ghost Behaviors
-
-- **Blinky (Red)**: Aggressive chaser - always follows Pac-Man directly
-- **Pinky (Pink)**: Ambusher - targets 4 spaces ahead of Pac-Man
-- **Inky (Cyan)**: Unpredictable - uses complex targeting
-- **Clyde (Orange)**: Shy - chases when far, scatters when close
+- Dot: `10`
+- Power pellet: `50`
+- Ghost 1: `200`
+- Ghost 2: `400`
+- Ghost 3: `800`
+- Ghost 4: `1600`
+- Extra life threshold: `10000`
 
 ## Development
 
-The game is organized into a clean package structure:
+### Test And Typecheck
 
+Run the tests:
+
+```bash
+python -m pytest
 ```
-PyPacman
-├── CHANGELOG.md
+
+Run type checking after installing the dev extras:
+
+```bash
+python -m mypy PyPacman
+```
+
+### Architecture
+
+The codebase now uses a typed core with protocol-based boundaries to reduce import coupling.
+
+Internal modules prefer leaf-module imports over package-barrel imports to keep the runtime import graph narrow and reduce circular import risk.
+
+- `PyPacman/core/types.py`
+  - Shared structural types such as `Position`, `Direction`, `GameMode`, and `CellType`
+  - Lightweight protocols including `MazeProtocol`, `PacManProtocol`, and `GhostProtocol`
+- `PyPacman/core/config.py`
+  - Tunable dimensions, timing, and scoring configuration
+- `PyPacman/core/colors.py` and `PyPacman/core/sprites.py`
+  - Rendering constants separated from gameplay logic
+- `PyPacman/core/game_engine.py`
+  - Main game loop, screen flow, and orchestration
+- `PyPacman/core/maze.py`
+  - Maze parsing, collision rules, and spawn resolution
+- `PyPacman/entities/`
+  - Pac-Man, ghosts, and shared movement behavior
+- `PyPacman/ui/`
+  - Display rendering and keyboard input
+- `PyPacman/data/levels.py`
+  - Maze layouts and layout helpers
+
+### Project Layout
+
+```text
+PyPacman/
 ├── AGENTS.md
-├── LICENSE
-├── PyPacman
-│   ├── core
-│   │   ├── constants.py
-│   │   ├── game_engine.py
-│   │   ├── game_state.py
-│   │   ├── __init__.py
-│   │   ├── maze.py
-│   │   ├── __pycache__
-│   │   └── scoring.py
-│   ├── data
-│   │   ├── __init__.py
-│   │   ├── levels.py
-│   │   └── __pycache__
-│   ├── entities
-│   │   ├── base.py
-│   │   ├── ghost_manager.py
-│   │   ├── ghost.py
-│   │   ├── __init__.py
-│   │   ├── pacman.py
-│   │   └── __pycache__
-│   ├── __init__.py
-│   ├── main.py
-│   ├── __pycache__
-│   └── ui
-│       ├── display.py
-│       ├── __init__.py
-│       ├── input_handler.py
-│       └── __pycache__
-├── pyproject.toml
+├── CHANGELOG.md
 ├── README.md
-├── requirements.txt
-├── setup.py
-└── tests
-    ├── __init__.py
-    ├── __pycache__
+├── pyproject.toml
+├── PyPacman/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── colors.py
+│   │   ├── config.py
+│   │   ├── game_engine.py
+│   │   ├── game_state.py
+│   │   ├── maze.py
+│   │   ├── scoring.py
+│   │   ├── sprites.py
+│   │   └── types.py
+│   ├── data/
+│   │   ├── __init__.py
+│   │   └── levels.py
+│   ├── entities/
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   ├── ghost.py
+│   │   ├── ghost_manager.py
+│   │   └── pacman.py
+│   └── ui/
+│       ├── __init__.py
+│       ├── display.py
+│       └── input_handler.py
+└── tests/
     ├── test_display.py
     ├── test_game_engine.py
     ├── test_game_state.py
@@ -158,24 +164,11 @@ PyPacman
     └── test_scoring.py
 ```
 
-See `AGENTS.md` for detailed development planning and architecture.
+## Notes
 
-### Running Tests
-
-```bash
-python -m pytest tests/
-```
-
-### Building for Distribution
-
-```bash
-python -m build
-```
+- The runtime stays dependency-free; `pytest`, `pytest-cov`, and `mypy` are development extras only.
+- The current package supports `python -m PyPacman.main`; there is no `PyPacman/__main__.py` entrypoint at the moment.
 
 ## License
 
-MIT License - Feel free to modify and share!
-
-## Acknowledgments
-
-Inspired by the original Pac-Man arcade game by Namco (1980).
+MIT License.

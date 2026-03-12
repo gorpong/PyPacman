@@ -1,10 +1,10 @@
 """Main entry point for ASCII Pac-Man game."""
 
 import sys
-from .core import GameEngine
+from .core.game_engine import GameEngine
 
 
-def main():
+def main() -> None:
     """Main function to start the game."""
     try:
         game = GameEngine()
