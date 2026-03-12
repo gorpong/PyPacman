@@ -14,7 +14,8 @@ from PyPacman.entities.ghost_manager import GhostManager
 from PyPacman.entities.base import Position
 from PyPacman.core.maze import Maze
 from PyPacman.entities.pacman import PacMan
-from PyPacman.core.constants import Colors
+from PyPacman.core.types import Position
+from PyPacman.core.colors import Colors
 
 
 class TestGhost(unittest.TestCase):
@@ -408,54 +409,54 @@ class TestGhostManager(unittest.TestCase):
         """Test collision detection when ghost and Pac-Man cross paths."""
         test_ghost = self.ghost_manager.ghosts[0]
         test_ghost.state = GhostState.ACTIVE
-        
+    
         test_ghost.position.x = 6
         test_ghost.position.y = 3
         self.pacman.position.x = 5
         self.pacman.position.y = 3
-        
-        previous_pacman_pos = (6, 3)
-        self.ghost_manager.previous_ghost_positions[0] = (5, 3)
-        
+    
+        previous_pacman_pos = Position(6, 3)
+        self.ghost_manager.previous_ghost_positions[0] = Position(5, 3)
+    
         colliding_ghost = self.ghost_manager.check_collision_with_pacman(
             self.pacman, previous_pacman_pos
         )
         self.assertEqual(colliding_ghost, test_ghost)
-    
+
     def test_collision_detection_pacman_catches_ghost(self):
         """Test collision when Pac-Man moves to ghost's previous position."""
         test_ghost = self.ghost_manager.ghosts[0]
         test_ghost.state = GhostState.ACTIVE
-        
+    
         # Ghost was at (5, 3), now still at (5, 3) - didn't move
         # Pac-Man was at (4, 3), now at (5, 3) - moved to ghost
         test_ghost.position.x = 5
         test_ghost.position.y = 3
         self.pacman.position.x = 5
         self.pacman.position.y = 3
-        
-        previous_pacman_pos = (4, 3)
-        self.ghost_manager.previous_ghost_positions[0] = (5, 3)
-        
+    
+        previous_pacman_pos = Position(4, 3)
+        self.ghost_manager.previous_ghost_positions[0] = Position(5, 3)
+    
         colliding_ghost = self.ghost_manager.check_collision_with_pacman(
             self.pacman, previous_pacman_pos
         )
         self.assertEqual(colliding_ghost, test_ghost)
-    
+
     def test_no_collision(self):
         """Test no collision when ghosts are away."""
-        px, py = self.pacman.get_position()
+        pac_pos = self.pacman.get_position()
         for ghost in self.ghost_manager.ghosts:
             ghost.position.x = 1
             ghost.position.y = 1
-        
+    
         self.ghost_manager._update_previous_positions()
-        
+    
         colliding_ghost = self.ghost_manager.check_collision_with_pacman(
-            self.pacman, (px, py)
+            self.pacman, pac_pos
         )
         self.assertIsNone(colliding_ghost)
-    
+
     def test_no_collision_with_inactive_ghost(self):
         """Test that inactive ghosts don't trigger collision."""
         test_ghost = self.ghost_manager.ghosts[0]

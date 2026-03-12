@@ -12,23 +12,12 @@ Legend:
     P = Pac-Man spawn point (treated as empty space)
     F = Fruit spawn point (treated as empty space, for future use)
       = Empty space (no dot)
-
-Design Guidelines:
-    - Mazes should be roughly symmetrical left-to-right
-    - All dots and power pellets must be reachable by Pac-Man
-    - Ghost house should be centered with a door (-) on top
-    - Power pellets traditionally go in corners
-    - Tunnels on sides should wrap around (handled by game engine)
-    - Keep maze height to 18-19 rows max to fit in 24-line display with HUD
 """
+from __future__ import annotations
 
-# =============================================================================
-# LEVEL 1 - Classic Layout
-# =============================================================================
-# Inspired by the original Pac-Man arcade maze
-# Size: 28 wide x 18 tall (fits in 24-line terminal with HUD)
+from ..core.types import Position
 
-LEVEL_1 = [
+LEVEL_1: list[str] = [
     "############################",
     "#............##............#",
     "#.####.#####.##.#####.####.#",
@@ -50,13 +39,7 @@ LEVEL_1 = [
     "############################",
 ]
 
-# =============================================================================
-# LEVEL 2 - Open Arena  
-# =============================================================================
-# More open layout with larger corridors
-# Size: 28 wide x 18 tall
-
-LEVEL_2 = [
+LEVEL_2: list[str] = [
     "############################",
     "#O..........##..........O#",
     "#.####.####.##.####.####.#",
@@ -78,13 +61,7 @@ LEVEL_2 = [
     "############################",
 ]
 
-# =============================================================================
-# LEVEL 3 - Maze Runner
-# =============================================================================
-# More complex maze with tighter corridors
-# Size: 28 wide x 18 tall
-
-LEVEL_3 = [
+LEVEL_3: list[str] = [
     "############################",
     "#O............##..........O#",
     "#.###.#######.##.#######.###",
@@ -106,13 +83,7 @@ LEVEL_3 = [
     "############################",
 ]
 
-# =============================================================================
-# LEVEL 4 - Speed Run
-# =============================================================================
-# Wide corridors for fast gameplay
-# Size: 28 wide x 18 tall  
-
-LEVEL_4 = [
+LEVEL_4: list[str] = [
     "############################",
     "#O..........##..........O#",
     "#.####.####.##.####.####.#",
@@ -134,13 +105,7 @@ LEVEL_4 = [
     "############################",
 ]
 
-# =============================================================================
-# LEVEL TEST - Simple Testing Maze
-# =============================================================================
-# Small, simple maze for testing and debugging
-# Size: 28 wide x 13 tall
-
-LEVEL_TEST = [
+LEVEL_TEST: list[str] = [
     "############################",
     "#O..........##..........O#",
     "#.###.####.####.####.###.#",
@@ -156,13 +121,7 @@ LEVEL_TEST = [
     "############################",
 ]
 
-# =============================================================================
-# LEVEL MINI - Compact Maze
-# =============================================================================
-# Very small maze for tiny terminals or quick games
-# Size: 21 wide x 11 tall
-
-LEVEL_MINI = [
+LEVEL_MINI: list[str] = [
     "#####################",
     "#O.......##.......O#",
     "#.###.##.##.##.###.#",
@@ -176,11 +135,7 @@ LEVEL_MINI = [
     "#####################",
 ]
 
-# =============================================================================
-# Level Registry
-# =============================================================================
-
-LEVELS = {
+LEVELS: dict[int | str, list[str]] = {
     1: LEVEL_1,
     2: LEVEL_2,
     3: LEVEL_3,
@@ -189,29 +144,26 @@ LEVELS = {
     'mini': LEVEL_MINI,
 }
 
-# Level progression order
-LEVEL_ORDER = [1, 2, 3, 4]
+LEVEL_ORDER: list[int] = [1, 2, 3, 4]
 
 
-def get_level(level_num: int = 1) -> list:
+def get_level(level_num: int = 1) -> list[str]:
     """
     Get a level layout by number.
-    
+
     Args:
         level_num: Level number (1-based) or string key
-        
+
     Returns:
         List of strings representing the maze layout
     """
     if level_num in LEVELS:
         return LEVELS[level_num]
-    
-    # Cycle through numbered levels
+
     if isinstance(level_num, int) and level_num > len(LEVEL_ORDER):
         cycle_index = (level_num - 1) % len(LEVEL_ORDER)
         return LEVELS[LEVEL_ORDER[cycle_index]]
-    
-    # Default to level 1
+
     return LEVELS[1]
 
 
@@ -220,44 +172,43 @@ def get_level_count() -> int:
     return len(LEVEL_ORDER)
 
 
-def find_spawn_point(layout: list, marker: str = 'P') -> tuple:
+def find_spawn_point(layout: list[str], marker: str = 'P') -> Position | None:
     """
     Find a spawn point marker in the maze layout.
-    
+
     Args:
         layout: The maze layout (list of strings)
         marker: The character marking the spawn point
-        
+
     Returns:
-        Tuple (x, y) of the spawn position, or None if not found
+        Position of the spawn point, or None if not found
     """
     for y, row in enumerate(layout):
         for x, char in enumerate(row):
             if char == marker:
-                return (x, y)
+                return Position(x, y)
     return None
 
 
-def find_ghost_house_center(layout: list) -> tuple:
+def find_ghost_house_center(layout: list[str]) -> Position | None:
     """
     Find the center of the ghost house.
-    
+
     Args:
         layout: The maze layout (list of strings)
-        
+
     Returns:
-        Tuple (x, y) of the ghost house center, or None if not found
+        Position of the ghost house center, or None if not found
     """
-    ghost_positions = []
+    ghost_positions: list[tuple[int, int]] = []
     for y, row in enumerate(layout):
         for x, char in enumerate(row):
             if char == 'G':
                 ghost_positions.append((x, y))
-    
+
     if not ghost_positions:
         return None
-    
-    # Calculate center
+
     avg_x = sum(p[0] for p in ghost_positions) // len(ghost_positions)
     avg_y = sum(p[1] for p in ghost_positions) // len(ghost_positions)
-    return (avg_x, avg_y)
+    return Position(avg_x, avg_y)

@@ -3,7 +3,9 @@ Tests for maze functionality.
 """
 
 import unittest
-from PyPacman.core.maze import Maze, Cell
+from PyPacman.core.maze import Maze
+from PyPacman.core.types import Position, CellType
+from PyPacman.core.colors import Colors
 
 
 class TestMaze(unittest.TestCase):
@@ -239,7 +241,7 @@ class TestMaze(unittest.TestCase):
         self.assertEqual(empty_maze.height, 0)
         self.assertFalse(empty_maze.is_valid_position(0, 0))
     
-    def test_default_spawn_when_no_marker(self):
+    def test_default_spawn_when_no_marker(self) -> None:
         """Test default spawn point when P marker is missing."""
         simple_layout = [
             "#####",
@@ -248,16 +250,18 @@ class TestMaze(unittest.TestCase):
         ]
         maze = Maze(simple_layout)
         spawn = maze.get_pacman_spawn()
-        # Should default to center-ish position
+        # Should return a Position object
         self.assertIsNotNone(spawn)
-        self.assertEqual(len(spawn), 2)
-    
-    def test_ghost_door_position(self):
+        self.assertIsInstance(spawn, Position)
+        self.assertIsInstance(spawn.x, int)
+        self.assertIsInstance(spawn.y, int)
+
+    def test_ghost_door_position(self) -> None:
         """Test getting ghost door position."""
         door_pos = self.maze.get_ghost_door_position()
         self.assertIsNotNone(door_pos)
         # Should be at the center of the door cells (row 2)
-        self.assertEqual(door_pos[1], 2)
+        self.assertEqual(door_pos.y, 2)
 
 
 class TestMazeBackwardsCompatibility(unittest.TestCase):

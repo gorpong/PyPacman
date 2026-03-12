@@ -7,7 +7,7 @@ name = "PyPacman"
 version = "1.0.0"
 description = "A terminal-based ASCII version of the classic Pac-Man arcade game"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
     {name = "ASCII Game Studio"},
@@ -20,27 +20,63 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Games/Entertainment :: Arcade",
+    "Typing :: Typed",
 ]
 dependencies = []
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "mypy>=1.0.0",
+]
+
 [project.scripts]
-PyPacman = "PyPacman:main"
-pacman = "PyPacman:main"
+pypacman = "PyPacman.main:main"
+pacman = "PyPacman.main:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/ascii-pacman"
-Repository = "https://github.com/yourusername/ascii-pacman.git"
-"Bug Tracker" = "https://github.com/yourusername/ascii-pacman/issues"
+Homepage = "https://github.com/yourusername/PyPacman"
+Repository = "https://github.com/yourusername/PyPacman.git"
+"Bug Tracker" = "https://github.com/yourusername/PyPacman/issues"
 
 [tool.setuptools.packages.find]
 include = ["PyPacman*"]
 exclude = ["tests*"]
 
-[tool.setuptools.package-data]
-PyPacman = ["data/*.py"]
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["PyPacman"]
+omit = ["tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]

@@ -1,5 +1,20 @@
-"""Game data and level definitions."""
+"""Data module for level layouts and game data."""
+from __future__ import annotations
 
-from .levels import get_level, LEVEL_1, LEVEL_TEST, LEVEL_MINI
+from .levels import (
+    LEVEL_ORDER,
+    LEVELS,
+    find_ghost_house_center,
+    find_spawn_point,
+    get_level,
+    get_level_count,
+)
 
-__all__ = ["get_level", "LEVEL_1", "LEVEL_TEST", "LEVEL_MINI"]
+__all__ = [
+    "LEVELS",
+    "LEVEL_ORDER",
+    "get_level",
+    "get_level_count",
+    "find_spawn_point",
+    "find_ghost_house_center",
+]
