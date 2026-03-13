@@ -64,6 +64,9 @@ class Ghost(MovableEntity):
         self.return_path: list[Position] = []
         self.path_target: Position | None = None
 
+        # External speed multiplier (for debug/testing)
+        self.external_speed_multiplier: float = 1.0
+
     def reset(self) -> None:
         """Reset ghost to starting position and state."""
         super().reset()
@@ -77,6 +80,15 @@ class Ghost(MovableEntity):
         self.return_path = []
         self.path_target = None
 
+    def set_speed_multiplier(self, multiplier: float) -> None:
+        """
+        Set an external speed multiplier for testing/debug purposes.
+
+        Args:
+            multiplier: Speed multiplier (0.1-2.0, where < 1.0 is slower)
+        """
+        self.external_speed_multiplier = multiplier
+
     def get_current_speed(self) -> float:
         """
         Calculate the current movement speed based on mode and state.
@@ -87,18 +99,20 @@ class Ghost(MovableEntity):
         base: float = self.BASE_SPEED
 
         if self.state == GhostState.IN_HOUSE:
-            return base * GhostSpeed.IN_HOUSE
+            speed = base * GhostSpeed.IN_HOUSE
         elif self.state == GhostState.LEAVING_HOUSE:
-            return base * GhostSpeed.LEAVING_HOUSE
+            speed = base * GhostSpeed.LEAVING_HOUSE
         elif self.state == GhostState.RETURNING:
-            return base * GhostSpeed.EATEN
-
-        if self.mode == GhostMode.VULNERABLE:
-            return base * GhostSpeed.VULNERABLE
+            speed = base * GhostSpeed.EATEN
+        elif self.mode == GhostMode.VULNERABLE:
+            speed = base * GhostSpeed.VULNERABLE
         elif self.mode == GhostMode.EATEN:
-            return base * GhostSpeed.EATEN
+            speed = base * GhostSpeed.EATEN
+        else:
+            speed = base * GhostSpeed.NORMAL
 
-        return base * GhostSpeed.NORMAL
+        # Apply external speed multiplier
+        return speed * self.external_speed_multiplier
 
     def update_movement(self, delta_time: float, maze: MazeProtocol) -> bool:
         """

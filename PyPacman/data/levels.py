@@ -147,25 +147,27 @@ LEVELS: dict[int | str, list[str]] = {
 LEVEL_ORDER: list[int] = [1, 2, 3, 4]
 
 
-def get_level(level_num: int = 1) -> list[str]:
+def get_level(level_num: int | str = 1) -> list[str]:
     """
-    Get a level layout by number.
+    Get a level layout by number or name.
 
     Args:
-        level_num: Level number (1-based) or string key
+        level_num: Level number (1-based) or string key ('test', 'mini')
 
     Returns:
         List of strings representing the maze layout
     """
+    # Direct lookup for both int and string keys
     if level_num in LEVELS:
         return LEVELS[level_num]
 
+    # Handle numeric levels beyond the defined ones (cycle through)
     if isinstance(level_num, int) and level_num > len(LEVEL_ORDER):
         cycle_index = (level_num - 1) % len(LEVEL_ORDER)
         return LEVELS[LEVEL_ORDER[cycle_index]]
 
+    # Default fallback
     return LEVELS[1]
-
 
 def get_level_count() -> int:
     """Get the number of unique levels available."""
@@ -212,3 +214,13 @@ def find_ghost_house_center(layout: list[str]) -> Position | None:
     avg_x = sum(p[0] for p in ghost_positions) // len(ghost_positions)
     avg_y = sum(p[1] for p in ghost_positions) // len(ghost_positions)
     return Position(avg_x, avg_y)
+
+def get_available_levels() -> list[int | str]:
+    """
+    Get a list of all available level identifiers.
+
+    Returns:
+        List of level keys (integers and strings)
+    """
+    return list(LEVELS.keys())
+

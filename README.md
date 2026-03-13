@@ -62,6 +62,35 @@ You can also run the module directly from the repository:
 python -m PyPacman.main
 ```
 
+## Command-Line Options
+
+```bash
+# Start at a specific level
+pacman --level test
+pacman -l mini
+pacman -l 3
+
+# Adjust ghost speed (0.1-2.0, where < 1.0 is slower)
+pacman --ghost-speed 0.5
+pacman -g 0.25
+
+# Combine options for testing
+pacman -l test -g 0.3
+
+# List all available levels
+pacman --list-levels
+
+# Show help
+pacman --help
+```
+
+| Option | Short | Description
+| ------ | ----- | -----------
+| `--level LEVEL` | `-l` | Starting level (1-4, test, mini) |
+| `--ghost-speed SPEED` | `-g` | Ghost speed multiplier (0.1 - 2.0) |
+| `--list-levels` | `-L` | List available levels and exit |
+| `--help` | `-h` | Show help message and exit |
+
 ## Controls
 
 - Arrow keys: move Pac-Man
@@ -166,8 +195,12 @@ PyPacman/
 
 ## Notes
 
+## Notes
+
 - The runtime stays dependency-free; `pytest`, `pytest-cov`, and `mypy` are development extras only.
 - The current package supports `python -m PyPacman.main`; there is no `PyPacman/__main__.py` entrypoint at the moment.
+- Use `--ghost-speed` with values less than 1.0 to slow down ghosts for testing and debugging maze layouts.
+- The `test` and `mini` levels are available for development testing but are not part of normal level progression.
 
 ## License
 

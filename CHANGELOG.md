@@ -4,8 +4,34 @@ All notable changes to ASCII Pac-Man are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Command-line argument `--level` / `-l` to start at a specific level
+- Command-line argument `--ghost-speed` / `-g` to adjust ghost speed for testing
+- Command-line argument `--list-levels` / `-L` to display available levels
+- `get_available_levels()` function in `data/levels.py`
+- `SCORE_GHOST_MAX` constant in `core/config.py` for ghost score cap
+- `ScoringSystem.get_next_ghost_points()` method for read-only point preview
+- `Ghost.set_speed_multiplier()` method for external speed control
+- `Ghost.external_speed_multiplier` attribute
+- `starting_level` parameter to `GameEngine` and `GameState`
+- `ghost_speed_multiplier` parameter to `GameEngine` and `GhostManager`
+- `tests/test_cli.py` with 39 new tests
+
+### Fixed
+
+- Ghost scoring now properly uses `SCORE_GHOST_BASE` from config instead of hardcoded values
+- Ghost scoring now caps at 1600 points as expected
+- Fixed ghost collision detection checking vulnerability after ghost was already marked as eaten
+- `ScoringSystem` is now the single source of truth for ghost scoring
+- Removed duplicate point calculations from `GameEngine` and `GhostManager`
+
 ### Changed
 
+- `GameState` now accepts `starting_level` parameter and resets to it
+- `GhostManager` now accepts `speed_multiplier` parameter
+- `Ghost.get_current_speed()` now applies external speed multiplier
+- Test count increased from 112 to 119
 - Refactored the old monolithic core constants module into focused modules:
   `core/config.py`, `core/colors.py`, `core/sprites.py`, and `core/types.py`
 - Introduced protocol-based boundaries with `MazeProtocol`,

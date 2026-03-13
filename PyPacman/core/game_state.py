@@ -5,22 +5,28 @@ from __future__ import annotations
 class GameState:
     """Manages game state including lives, level, and game over."""
 
-    def __init__(self, starting_lives: int = 3) -> None:
+    def __init__(
+        self,
+        starting_lives: int = 3,
+        starting_level: int = 1
+    ) -> None:
         """
         Initialize game state.
 
         Args:
             starting_lives: Number of lives to start with
+            starting_level: Level to start at (1-based)
         """
         self.starting_lives: int = starting_lives
+        self.starting_level: int = starting_level
         self.lives: int = starting_lives
-        self.level: int = 1
+        self.level: int = starting_level
         self.game_over: bool = False
 
     def reset(self) -> None:
         """Reset game state for new game."""
         self.lives = self.starting_lives
-        self.level = 1
+        self.level = self.starting_level
         self.game_over = False
 
     def lose_life(self) -> bool:

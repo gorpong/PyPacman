@@ -19,6 +19,26 @@ If any instructions conflicts with a user request, ask before proceeding.
 - **Python Version**: 3.11 or better
 - **Dependencies**: Minimal - using only Python standard library
 
+### Command-Line Interface
+
+The game supports command-line arguments for testing and debugging:
+
+```bash
+pacman [options]
+
+Options:
+  -l, --level LEVEL       Start at specific level (1-4, test, mini)
+  -g, --ghost-speed SPEED Ghost speed multiplier (0.1-2.0)
+  -L, --list-levels       List available levels and exit
+  -h, --help              Show help message
+```
+
+### Testing Workflows
+
+- Use `-l test` or `-l mini` to test special maze layouts
+- Use `-g 0.2` to slow ghosts to 20% speed for detailed testing
+- Combine both: `pacman -l 3 -g 0.25` to test level 3 with slow ghosts
+
 ## Technical Architecture
 
 ### Core Design Patterns
@@ -79,15 +99,23 @@ If any instructions conflicts with a user request, ask before proceeding.
 
 All development phases complete. The game is feature-complete, tested, and ready for use.
 
+### Recent Updates
+
+- Added command-line arguments for level selection (`--level`) and ghost speed control (`--ghost-speed`)
+- Fixed ghost scoring system to properly use config constants and cap at 1600 points
+- Added `--list-levels` option to display available levels
+- Test suite expanded to 119 tests
+
 ### Completed Phases
 
-✅ **Phase 1: Foundation and Game Engine** - Complete
-✅ **Phase 2: Maze and World** - Complete
-✅ **Phase 3: Pac-Man Character** - Complete
-✅ **Phase 4: Ghost AI** - Complete
-✅ **Refactoring: Package Structure** - Complete
-✅ **Phase 5: Game Logic and Polish** - Complete
-✅ **Phase 6: Final Integration and Testing** - Complete
+- ✅ **Phase 1: Foundation and Game Engine** - Complete
+- ✅ **Phase 2: Maze and World** - Complete
+- ✅ **Phase 3: Pac-Man Character** - Complete
+- ✅ **Phase 4: Ghost AI** - Complete
+- ✅ **Refactoring: Package Structure** - Complete
+- ✅ **Phase 5: Game Logic and Polish** - Complete
+- ✅ **Phase 6: Final Integration and Testing** - Complete
+- ✅ **CLI Debug Features** - Complete
 
 ### Version 1.0 Features
 
@@ -100,13 +128,14 @@ All development phases complete. The game is feature-complete, tested, and ready
 - ✅ Visual effects (score popups, animations)
 - ✅ Scrolling high scores on splash screen
 - ✅ Dual control schemes (arrows + WASD)
-- ✅ 112 comprehensive tests, all passing
+- ✅ Command-line level selection and ghost speed control
+- ✅ 119 comprehensive tests, all passing
 - ✅ PyPI-ready package structure
 
 **Current Branch**: Varies by worktree
 **Version**: 1.0
 **Status**: Released and ready for distribution
-**Tests**: 112/112 passing ✅
+**Tests**: 119/119 passing ✅
 
 ## Documentation Maintenance 📚
 

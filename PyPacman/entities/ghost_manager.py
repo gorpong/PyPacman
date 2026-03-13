@@ -9,9 +9,16 @@ from .ghost import Blinky, Clyde, Ghost, GhostMode, GhostState, Inky, Pinky
 class GhostManager:
     """Manages all four ghosts and their coordinated behaviors."""
 
-    def __init__(self, maze: MazeProtocol) -> None:
-        """Initialize the ghost manager with ghost starting positions."""
+    def __init__(self, maze: MazeProtocol, speed_multiplier: float = 1.0) -> None:
+        """
+        Initialize the ghost manager with ghost starting positions.
+
+        Args:
+            maze: The maze protocol instance
+            speed_multiplier: External speed multiplier for all ghosts (0.1-2.0)
+        """
         self.maze: MazeProtocol = maze
+        self.speed_multiplier: float = speed_multiplier
 
         ghost_spawns = maze.get_ghost_spawn_positions()
 
@@ -31,7 +38,9 @@ class GhostManager:
 
         self.ghosts: list[Ghost] = [blinky, pinky, inky, clyde]
 
+        # Apply speed multiplier to all ghosts
         for ghost in self.ghosts:
+            ghost.set_speed_multiplier(speed_multiplier)
             ghost.set_scatter_target_for_maze(maze)
 
         self.previous_ghost_positions: list[Position] = []
@@ -62,6 +71,7 @@ class GhostManager:
         """Reset all ghosts to starting state."""
         for ghost in self.ghosts:
             ghost.reset()
+            ghost.set_speed_multiplier(self.speed_multiplier)
             ghost.set_scatter_target_for_maze(self.maze)
 
         self._update_previous_positions()
@@ -127,6 +137,9 @@ class GhostManager:
         1. Same cell collision (ghost and Pac-Man in same position)
         2. Crossing collision (ghost and Pac-Man swapped positions)
 
+        Note: This method does NOT call get_eaten() on the ghost.
+        The caller is responsible for handling the collision appropriately.
+
         Args:
             pacman: The Pac-Man instance
             previous_pacman_pos: Pac-Man's position before this frame's movement
@@ -146,11 +159,11 @@ class GhostManager:
             ghost_pos = ghost.get_position()
             gx, gy = ghost_pos.x, ghost_pos.y
 
+            # Same cell collision
             if gx == px and gy == py:
-                if ghost.is_vulnerable():
-                    self.eat_ghost(ghost)
                 return ghost
 
+            # Crossing collision detection
             if previous_pacman_pos is not None and i < len(self.previous_ghost_positions):
                 prev_px, prev_py = previous_pacman_pos.x, previous_pacman_pos.y
                 prev_ghost_pos = self.previous_ghost_positions[i]
@@ -160,21 +173,27 @@ class GhostManager:
                 ghost_moved_to_pacman: bool = (gx == prev_px and gy == prev_py)
 
                 if pacman_moved_to_ghost and ghost_moved_to_pacman:
-                    if ghost.is_vulnerable():
-                        self.eat_ghost(ghost)
                     return ghost
 
                 if pacman_moved_to_ghost and (gx == prev_gx and gy == prev_gy):
-                    if ghost.is_vulnerable():
-                        self.eat_ghost(ghost)
                     return ghost
 
                 if ghost_moved_to_pacman and (px == prev_px and py == prev_py):
-                    if ghost.is_vulnerable():
-                        self.eat_ghost(ghost)
                     return ghost
 
         return None
+
+
+    def _handle_ghost_eaten(self, ghost: Ghost) -> None:
+        """
+        Handle a ghost being eaten.
+
+        Args:
+            ghost: The ghost that was eaten
+        """
+        ghost.get_eaten()
+        self.ghosts_eaten_in_sequence += 1
+
 
     def eat_ghost(self, ghost: Ghost) -> int:
         """
@@ -184,16 +203,17 @@ class GhostManager:
             ghost: The ghost being eaten
 
         Returns:
-            Points scored for eating the ghost
+            Points scored for eating the ghost (200, 400, 800, or 1600)
         """
         if ghost.is_vulnerable():
             ghost.get_eaten()
 
             base_score: int = 200
             score: int = base_score * (2 ** self.ghosts_eaten_in_sequence)
+            score = min(score, 1600)
             self.ghosts_eaten_in_sequence += 1
 
-            return min(score, 1600)
+            return score
 
         return 0
 

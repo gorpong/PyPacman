@@ -24,9 +24,19 @@ class GameEngine:
     def __init__(
             self,
             display: Display | None = None,
-            input_handler: InputHandler | None = None
+            input_handler: InputHandler | None = None,
+            starting_level: int | str | None = None,
+            ghost_speed_multiplier: float | None = None
     ) -> None:
-        """Initialize the game engine."""
+        """
+        Initialize the game engine.
+
+        Args:
+            display: Display instance (or None for default)
+            input_handler: InputHandler instance (or None for default)
+            starting_level: Level to start at (int or string like 'test', 'mini')
+            ghost_speed_multiplier: Speed multiplier for ghosts (0.1-2.0, None for default)
+        """
         self.display: Display = display or Display()
         self.input_handler: InputHandler = input_handler or InputHandler()
 
@@ -35,8 +45,25 @@ class GameEngine:
         self.last_frame_time: float = 0.0
         self.paused: bool = False
 
+        # Store the starting level for resets
+        self.starting_level: int | str | None = starting_level
+
+        # Store ghost speed multiplier
+        self.ghost_speed_multiplier: float | None = ghost_speed_multiplier
+
+        # Determine the numeric starting level for GameState
+        starting_level_num: int = 1
+        if isinstance(starting_level, int):
+            starting_level_num = starting_level
+        elif isinstance(starting_level, str):
+            # For named levels, GameState tracks as level 1 but we load the named layout
+            starting_level_num = 1
+
         self.scoring: ScoringSystem = ScoringSystem()
-        self.game_state: GameState = GameState(starting_lives=3)
+        self.game_state: GameState = GameState(
+            starting_lives=3,
+            starting_level=starting_level_num
+        )
 
         self.maze: Maze | None = None
         self.pacman: PacMan | None = None
@@ -266,12 +293,17 @@ class GameEngine:
 
         if colliding_ghost:
             if colliding_ghost.is_vulnerable():
-                eaten_count = self.ghost_manager.ghosts_eaten_in_sequence
-                points = 200 * (2 ** (eaten_count - 1))
-                points = min(points, 1600)
+                # Add score through scoring system
+                points = self.scoring.add_ghost()
+
+                # Mark ghost as eaten
+                colliding_ghost.get_eaten()
+                self.ghost_manager.ghosts_eaten_in_sequence += 1
+
+                # Show popup
                 pac_pos = self.pacman.get_position()
                 self.score_popup = (f"+{points}", pac_pos.x, pac_pos.y, 1.0)
-                self.scoring.add_ghost()
+
             elif colliding_ghost.is_dangerous():
                 self.death_timer = 1.5
                 game_over = self.game_state.lose_life()
@@ -584,7 +616,12 @@ class GameEngine:
 
     def _initialize_game(self) -> None:
         """Initialize the game objects for the current level."""
-        layout = get_level(self.game_state.get_level())
+        # Use starting_level override if it's a named level, otherwise use game_state level
+        if isinstance(self.starting_level, str):
+            layout = get_level(self.starting_level)
+        else:
+            layout = get_level(self.game_state.get_level())
+
         self.maze = Maze(layout)
 
         spawn_pos = self.maze.get_pacman_spawn()
@@ -595,7 +632,11 @@ class GameEngine:
         self.pacman = PacMan(spawn_pos.x, spawn_pos.y)
         self.previous_pacman_pos = spawn_pos
 
-        self.ghost_manager = GhostManager(self.maze)
+        # Pass ghost speed multiplier to GhostManager
+        if self.ghost_speed_multiplier is not None:
+            self.ghost_manager = GhostManager(self.maze, speed_multiplier=self.ghost_speed_multiplier)
+        else:
+            self.ghost_manager = GhostManager(self.maze)
 
     def _find_pacman_start_position(self) -> Position:
         """Find a suitable starting position for Pac-Man."""

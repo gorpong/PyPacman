@@ -113,6 +113,54 @@ class TestScoringSystem(unittest.TestCase):
         self.assertEqual(self.scoring.get_score(), 0)
         self.assertEqual(self.scoring.ghosts_eaten_combo, 0)
 
+    def test_ghost_scoring_uses_config_constants(self):
+        """Test that ghost scoring uses SCORE_GHOST_BASE from config."""
+        from PyPacman.core.config import SCORE_GHOST_BASE
+        points = self.scoring.add_ghost()
+        self.assertEqual(points, SCORE_GHOST_BASE)
+
+    def test_ghost_scoring_max_cap(self):
+        """Test that ghost scoring caps at 1600."""
+        # Eat 5 ghosts - the 5th should still be 1600, not 3200
+        self.scoring.add_ghost()  # 200
+        self.scoring.add_ghost()  # 400
+        self.scoring.add_ghost()  # 800
+        self.scoring.add_ghost()  # 1600
+        points5 = self.scoring.add_ghost()  # Should cap at 1600
+        self.assertEqual(points5, 1600)
+
+    def test_ghost_combo_count(self):
+        """Test that ghost combo count increments correctly."""
+        self.assertEqual(self.scoring.ghosts_eaten_combo, 0)
+        self.scoring.add_ghost()
+        self.assertEqual(self.scoring.ghosts_eaten_combo, 1)
+        self.scoring.add_ghost()
+        self.assertEqual(self.scoring.ghosts_eaten_combo, 2)
+
+    def test_get_ghost_points_without_adding(self):
+        """Test getting ghost points without modifying state."""
+        # First ghost would be 200
+        points = self.scoring.get_next_ghost_points()
+        self.assertEqual(points, 200)
+        # State should not change
+        self.assertEqual(self.scoring.ghosts_eaten_combo, 0)
+        self.assertEqual(self.scoring.get_score(), 0)
+
+    def test_get_ghost_points_reflects_combo(self):
+        """Test that get_next_ghost_points reflects current combo."""
+        self.scoring.add_ghost()  # combo becomes 1
+        points = self.scoring.get_next_ghost_points()
+        self.assertEqual(points, 400)  # Next would be 400
+
+    def test_get_ghost_points_respects_cap(self):
+        """Test that get_next_ghost_points respects the 1600 cap."""
+        self.scoring.add_ghost()  # 200, combo=1
+        self.scoring.add_ghost()  # 400, combo=2
+        self.scoring.add_ghost()  # 800, combo=3
+        self.scoring.add_ghost()  # 1600, combo=4
+        points = self.scoring.get_next_ghost_points()
+        self.assertEqual(points, 1600)  # Capped
+
 
 if __name__ == '__main__':
     unittest.main()

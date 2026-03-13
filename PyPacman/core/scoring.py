@@ -4,7 +4,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .config import SCORE_DOT, SCORE_GHOST_BASE, SCORE_POWER_PELLET
+from .config import (
+    SCORE_DOT,
+    SCORE_GHOST_BASE,
+    SCORE_GHOST_MAX,
+    SCORE_GHOST_MULTIPLIER,
+    SCORE_POWER_PELLET,
+)
 
 
 class ScoringSystem:
@@ -53,9 +59,40 @@ class ScoringSystem:
         self.score += SCORE_POWER_PELLET
         return SCORE_POWER_PELLET
 
+    def _calculate_ghost_points(self, combo_count: int) -> int:
+        """
+        Calculate ghost points based on combo count.
+
+        Args:
+            combo_count: Number of ghosts already eaten in this combo (0-based)
+
+        Returns:
+            Points for the next ghost, capped at SCORE_GHOST_MAX
+        """
+        points = SCORE_GHOST_BASE * (SCORE_GHOST_MULTIPLIER ** combo_count)
+        return min(points, SCORE_GHOST_MAX)
+
+    def get_next_ghost_points(self) -> int:
+        """
+        Get the points that would be awarded for eating the next ghost.
+
+        This does not modify state - use add_ghost() to actually award points.
+
+        Returns:
+            Points for the next ghost
+        """
+        return self._calculate_ghost_points(self.ghosts_eaten_combo)
+
     def add_ghost(self) -> int:
-        """Award points for eating a ghost (progressive scoring)."""
-        points = SCORE_GHOST_BASE * (2 ** self.ghosts_eaten_combo)
+        """
+        Award points for eating a ghost (progressive scoring).
+
+        Points double with each ghost eaten: 200, 400, 800, 1600 (capped).
+
+        Returns:
+            Points awarded
+        """
+        points = self._calculate_ghost_points(self.ghosts_eaten_combo)
         self.score += points
         self.ghosts_eaten_combo += 1
         return points
